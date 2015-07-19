@@ -3,6 +3,10 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope, store, auth, $state) {
       $scope.logout = function() {
+        //delete on online users list
+        var user_online = user.child("users").child(auth.profile.user_id);
+        user_online.set({});
+
         auth.signout();
         store.remove('token');
         store.remove('profile');
@@ -44,16 +48,23 @@ angular.module('starter.controllers', [])
             }
             else console.log(auth);
           });
+          // save info when first login
           var usersRef = user.child("users").child(profile.user_id);
           usersRef.once("value", function(snap) {
             if (snap.val() == null) {
               usersRef.set({
                 "email": auth.profile.email,
                 "full_name": auth.profile.name,
+                "headline": auth.profile.headline,
                 "url": auth.profile.publicProfileUrl,
+                "picture" : auth.profile.picture,
                 "hashtag": 1
               });
             }
+          });
+          var users_online = user.child("users_online").child(profile.user_id);
+          users_online.set({
+            "online" : true
           })
         }, function(error) {
           // Error getting the firebase token
@@ -72,7 +83,7 @@ angular.module('starter.controllers', [])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-
+  console.log(Chats.all());
   $scope.chats = Chats.all();
   $scope.remove = function(chat) {
     Chats.remove(chat);
