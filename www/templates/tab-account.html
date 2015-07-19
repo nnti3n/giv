@@ -1,0 +1,22 @@
+<ion-view view-title="Account">
+  <ion-content>
+    <ion-list>
+      <ion-toggle  ng-model="settings.enableFriends">
+          Enable Friends
+      </ion-toggle>
+
+      <h4 style="margin:15px; padding-top:30px;">Input Hastag</h4>
+      <label class="item item-input">
+        <input type="text" placeholder="Hashtag #1" ng-model="hashtag.hashtag1">
+      </label>
+      <label class="item item-input">
+        <input type="text" placeholder="Hashtag #2" ng-model="hashtag.hashtag2">
+      </label>
+      <label class="item item-input" style="border-bottom:1px solid rgba(0, 0, 0, 0.26);">
+        <input type="text" placeholder="Hashtag #3" ng-model="hashtag.hashtag3">
+      </label>
+      <button class="button button-block button-positive" type="submit" ng-click="submit_hash()" >Update</button>
+
+    </ion-list>
+  </ion-content>
+</ion-view>
