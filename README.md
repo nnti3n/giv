@@ -1,2 +1,0 @@
-# giv
-giv mobile application
