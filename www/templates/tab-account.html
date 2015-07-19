@@ -4,18 +4,26 @@
       <ion-toggle  ng-model="settings.enableFriends">
           Enable Friends
       </ion-toggle>
+      <div class="item item-button-right">
+        Logout
+        <button class="button button-positive" ng-click="logout()">
+          <i class="icon ion-log-out"></i>
+        </button>
+      </div>
 
       <h4 style="margin:15px; padding-top:30px;">Input Hastag</h4>
-      <label class="item item-input">
-        <input type="text" placeholder="Hashtag #1" ng-model="hashtag.hashtag1">
-      </label>
-      <label class="item item-input">
-        <input type="text" placeholder="Hashtag #2" ng-model="hashtag.hashtag2">
-      </label>
-      <label class="item item-input" style="border-bottom:1px solid rgba(0, 0, 0, 0.26);">
-        <input type="text" placeholder="Hashtag #3" ng-model="hashtag.hashtag3">
-      </label>
-      <button class="button button-block button-positive" type="submit" ng-click="submit_hash()" >Update</button>
+      <div class="list list-inset">
+        <label class="item item-input">
+          <input type="text" placeholder="Hashtag #1" ng-model="hashtag.hashtag1">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Hashtag #2" ng-model="hashtag.hashtag2">
+        </label>
+        <label class="item item-input">
+          <input type="text" placeholder="Hashtag #3" ng-model="hashtag.hashtag3">
+        </label>
+      </div>
+      <button class="button button-block button-positive" type="submit" ng-click="submit_hash()" style=" width: 95%;margin: 0 2.5%;" >Update</button>
 
     </ion-list>
   </ion-content>

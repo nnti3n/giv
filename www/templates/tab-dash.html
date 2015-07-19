@@ -1,20 +1,21 @@
 <ion-view view-title="Dashboard">
   <ion-content class="padding">
     <div class="list card">
-      <div class="item item-divider">Recent Updates<input type="submit" ng-click="logout()" value="Log out" class="button button-positive" style="font-size: 13px; float: right;"/></div>
+      <div class="item item-divider">Profile Information</div>
       <div class="item item-body">
-        <div>
-          There is a fire in <b>sector 3</b>
+        <img src="{{auth.profile.picture}}" style="float:left">
+        <div style="margin-left:20px; float:left;">
+          <p>{{auth.profile.name}}</p>
+          <p>{{auth.profile.headline}}</p>
+          <p>{{auth.profile.positions.values[0].company.name}}</p>
         </div>
       </div>
     </div>
     <div class="list card">
-      <div class="item item-divider">Profile Information</div>
+      <div class="item item-divider">Recent Updates</div>
       <div class="item item-body">
-        <img src="{{auth.profile.picture}}" style="float:left">
-        <div style="margin-left:10%; float:left;">
-          <p>{{auth.profile.name}}</p>
-          <p>{{auth.profile.headline}}</p>
+        <div>
+          There is a fire in <b>sector 3</b>
         </div>
       </div>
     </div>

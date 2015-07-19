@@ -2,19 +2,8 @@ angular.module('starter.controllers', [])
 
 
 .controller('DashCtrl', function($scope, store, auth, $state) {
-      $scope.logout = function() {
-        //delete on online users list
-        var user_online = user.child("users").child(auth.profile.user_id);
-        user_online.set({});
 
-        auth.signout();
-        store.remove('token');
-        store.remove('profile');
-        store.remove('refreshToken');
-        store.remove('firebaseToken');
-        $state.go('login');
-      };
-      console.log(auth.profile);
+      //console.log(auth.profile);
       $scope.auth = auth;
 })
 
@@ -83,8 +72,8 @@ angular.module('starter.controllers', [])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-  console.log(Chats.all());
   $scope.chats = Chats.all();
+  console.log(Chats.all());
   $scope.remove = function(chat) {
     Chats.remove(chat);
   };
@@ -92,9 +81,10 @@ angular.module('starter.controllers', [])
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
   $scope.chat = Chats.get($stateParams.chatId);
+  console.log($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope, store) {
+.controller('AccountCtrl', function($scope, store, auth, $state) {
   var profile_user = store.get('profile');
   console.log(profile_user);
   $scope.submit_hash = function () {
@@ -129,4 +119,18 @@ angular.module('starter.controllers', [])
       $scope.hashtag.hashtag3 = hashtag_val.hashtag3;
     }
   })
+
+  // Logout
+  $scope.logout = function() {
+    //delete on online users list
+    var user_online = user.child("users").child(auth.profile.user_id);
+    user_online.set({});
+
+    auth.signout();
+    store.remove('token');
+    store.remove('profile');
+    store.remove('refreshToken');
+    store.remove('firebaseToken');
+    $state.go('login');
+  };
 });

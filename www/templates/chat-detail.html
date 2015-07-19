@@ -6,9 +6,23 @@
 -->
 <ion-view view-title="{{chat.name}}">
   <ion-content class="padding">
-    <img ng-src="{{chat.face}}" style="width: 64px; height: 64px">
-    <p>
-      {{chat.lastText}}
-    </p>
+    <img ng-src="{{chat.picture}}" style="width: 100px; height: 100px; margin-bottom:20px;">
+    <h4 style="margin-bottom:20px;">
+      {{chat.headline}}
+    </h4>
+    <div class="card">
+      <div class="item item-divider">
+        Hashtag
+      </div>
+      <div class="item item-text-wrap">
+        {{chat.hashtag.hashtag1}}
+      </div>
+      <div class="item item-text-wrap">
+        {{chat.hashtag.hashtag2}}
+      </div>
+      <div class="item item-text-wrap">
+        {{chat.hashtag.hashtag3}}
+      </div>
+    </div>
   </ion-content>
 </ion-view>

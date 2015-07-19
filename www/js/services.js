@@ -30,13 +30,14 @@ angular.module('starter.services', [])
   //  lastText: 'This is wicked good ice cream.',
   //  face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
   //}];
-  var chats = [];
+  var chats = {};
   user.child("users_online").on("child_added",function(snapshot){
-    console.log("a");
+    //console.log("a");
     user.child("users").child(snapshot.key()).once("value",function(snap){
-      chats.push(snap.val());
-      console.log(chats);
-      console.log(snapshot.key());
+      //chats.push(snap.val());
+      chats[snapshot.key()] = snap.val();
+      //console.log(chats);
+      //console.log(snapshot.key());
     });
     //chats.push(user.child("users").child(snapshot.key()).once("value",function(snap){}));
   });
@@ -49,10 +50,16 @@ angular.module('starter.services', [])
       chats.splice(chats.indexOf(chat), 1);
     },
     get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].email === parseInt(chatId)) {
-          return chats[i];
-        }
+      //for (var i = 0; i < chats.length; i++) {
+      //  if (chats[i].email === parseInt(chatId)) {
+      //    return chats[i];
+      //  }
+      //}
+      for (var child in chats) {
+          if (child === chatId) {
+            console.log(chats[child]);
+            return chats[child];
+          }
       }
       return null;
     }
