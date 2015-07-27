@@ -1,16 +1,30 @@
-<ion-view view-title="Users">
-  <ion-content>
-    <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="(chat_key, value) in chats" type="item-text-wrap" href="#/tab/chats/{{chat_key}}">
-        <img ng-src="{{value.picture}}">
-        <h2>{{value.full_name}}</h2>
-        <p>{{value.headline}}</p>
-        <i class="icon ion-chevron-right icon-accessory"></i>
+<ion-view cache-view="false" view-title="GIVers">
+    <ion-content>
+        <ion-list>
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="search.searchText">
+            </label>
+            <ion-refresher pulling-text="Pull to refresh" on-refresh="doRefresh()">
+            </ion-refresher>
+            <ion-item class="item-remove-animate item-avatar item-icon-right"
+                      ng-repeat="(chat_key, value) in chats | filter:search.searchText | orderBy: value.distance"
+                      type="item-text-wrap" href="#/tab/chats/{{chat_key}}">
+                <img ng-src="{{value.picture}}">
 
-        <ion-option-button class="button-assertive" ng-click="remove(chat)">
-          Delete
-        </ion-option-button>
-      </ion-item>
-    </ion-list>
-  </ion-content>
+                <h2>{{value.full_name}}</h2>
+
+                <p>{{value.headline}}</p>
+
+                <p>{{"#"+ value.hashtag.hashtag1 + " #" +value.hashtag.hashtag2 + " #" + value.hashtag.hashtag3}}</p>
+
+                <p>Distance: {{value.distance}} Km</p>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+
+                <ion-option-button class="button-positive" ng-click="remove(chat)">
+                    Favorite
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+    </ion-content>
 </ion-view>

@@ -1,67 +1,89 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
+    .factory('Chats', function (store) {
+        //calculate distance by km
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c; // Distance in km
+            return Math.round(d * 100) / 100;
+        }
 
-  // Some fake testing data
-  //var chats = [{
-  //  id: 0,
-  //  name: 'Ben Sparrow',
-  //  lastText: 'You on your way?',
-  //  face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-  //}, {
-  //  id: 1,
-  //  name: 'Max Lynx',
-  //  lastText: 'Hey, it\'s me',
-  //  face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-  //}, {
-  //  id: 2,
-  //  name: 'Adam Bradleyson',
-  //  lastText: 'I should buy a boat',
-  //  face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-  //}, {
-  //  id: 3,
-  //  name: 'Perry Governor',
-  //  lastText: 'Look at my mukluks!',
-  //  face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-  //}, {
-  //  id: 4,
-  //  name: 'Mike Harrington',
-  //  lastText: 'This is wicked good ice cream.',
-  //  face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-  //}];
-  var chats = {};
-  user.child("users_online").on("child_added",function(snapshot){
-    //console.log("a");
-    user.child("users").child(snapshot.key()).once("value",function(snap){
-      //chats.push(snap.val());
-      chats[snapshot.key()] = snap.val();
-      //console.log(chats);
-      //console.log(snapshot.key());
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        //var chats = [];
+        //user.child("users_online").on("child_added", function (snapshot) {
+        //    //console.log("a");
+        //    var gps2 = snapshot.val().position;
+        //    var gps = store.get('gps');
+        //    user.child("users").child(snapshot.key()).once("value", function (snap) {
+        //        //push user online information to array
+        //        if (snapshot.key() != store.get('profile').user_id) {
+        //            chats.push(snap.val());
+        //            chats[chats.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
+        //        }
+        //        console.log(chats);
+        //    });
+        //});
+
+        return {
+            //distance: function () {
+            //    return chats;
+            //},
+            remove: function (chat) {
+                chats.splice(chats.indexOf(chat), 1);
+            },
+            get: function (chatId) {
+                //for (var i = 0; i < chats.length; i++) {
+                //  if (chats[i].email === parseInt(chatId)) {
+                //    return chats[i];
+                //  }
+                //}
+                for (var child in chats) {
+                    if (child === chatId) {
+                        console.log(chats[child]);
+                        return chats[child];
+                    }
+                }
+                return null;
+            }
+        };
+    })
+
+    .factory('GPS', function (auth, store, $cordovaGeolocation) {
+        return {
+            refresh: function () {
+                var users_online = user.child("users_online").child(auth.profile.user_id);
+                //get gps position
+                var gps = {"lat": "", "long": ""};
+                var posOptions = {timeout: 10000, enableHighAccuracy: false};
+                $cordovaGeolocation
+                    .getCurrentPosition(posOptions)
+                    .then(function (position) {
+                        gps.lat = position.coords.latitude;
+                        gps.long = position.coords.longitude;
+                        console.log(gps);
+                        users_online.set({
+                            "online": true,
+                            "position": {
+                                "lat": gps.lat,
+                                "long": gps.long
+                            }
+                        });
+                        store.set('gps', gps);
+                    }, function (err) {
+                        // error
+                        alert("Can't get gps position " + err);
+                    });
+            }
+        }
     });
-    //chats.push(user.child("users").child(snapshot.key()).once("value",function(snap){}));
-  });
-
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      //for (var i = 0; i < chats.length; i++) {
-      //  if (chats[i].email === parseInt(chatId)) {
-      //    return chats[i];
-      //  }
-      //}
-      for (var child in chats) {
-          if (child === chatId) {
-            console.log(chats[child]);
-            return chats[child];
-          }
-      }
-      return null;
-    }
-  };
-});

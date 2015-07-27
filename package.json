@@ -24,6 +24,9 @@
     "org.apache.cordova.inappbrowser"
   ],
   "cordovaPlatforms": [
-    "android"
+    {
+      "platform": "android",
+      "locator": "browser"
+    }
   ]
 }

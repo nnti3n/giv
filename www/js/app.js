@@ -5,143 +5,180 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services','auth0', 'angular-storage', 'angular-jwt'])
+angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'ngCordova'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
+    .run(function ($ionicPlatform) {
+        $ionicPlatform.ready(function () {
+            // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+            // for form inputs)
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
+                cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                cordova.plugins.Keyboard.disableScroll(true);
 
-    }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleLightContent();
-    }
-  });
-})
+            }
+            if (window.StatusBar) {
+                // org.apache.cordova.statusbar required
+                StatusBar.styleLightContent();
+            }
 
-.run(function($rootScope, auth, store, jwtHelper, $location) {
-  // This events gets triggered on refresh or URL change
-  var refreshingToken = null;
-  $rootScope.$on('$locationChangeStart', function() {
-    var token = store.get('token');
-    var refreshToken = store.get('refreshToken');
-    if (token) {
-      if (!jwtHelper.isTokenExpired(token)) {
-        if (!auth.isAuthenticated) {
-          auth.authenticate(store.get('profile'), token);
-        }
-      } else {
-        if (refreshToken) {
-          if (refreshingToken === null) {
-            refreshingToken =  auth.refreshIdToken(refreshToken).then(function(idToken) {
-              store.set('token', idToken);
-              auth.authenticate(store.get('profile'), idToken);
-            }).finally(function() {
-              refreshingToken = null;
+            if(window.Connection) {
+                if(navigator.connection.type == Connection.NONE) {
+                    $ionicPopup.confirm({
+                        title: 'No Internet Connection',
+                        content: 'Sorry, no Internet connectivity detected. Please reconnect and try again.'
+                    })
+                        .then(function(result) {
+                            if(!result) {
+                                ionic.Platform.exitApp();
+                            }
+                        });
+                }
+            }
+        });
+    })
+
+    .run(function (auth) {
+        // This hooks all auth events to check everything as soon as the app starts
+        auth.hookEvents();
+    })
+
+    .run(function ($rootScope, auth, store, jwtHelper, $location) {
+        // This events gets triggered on refresh or URL change
+        var refreshingToken = null;
+        $rootScope.$on('$locationChangeStart', function () {
+            var token = store.get('token');
+            var refreshToken = store.get('refreshToken');
+            if (token) {
+                if (!jwtHelper.isTokenExpired(token)) {
+                    if (!auth.isAuthenticated) {
+                        auth.authenticate(store.get('profile'), token);
+                    }
+                } else {
+                    if (refreshToken) {
+                        if (refreshingToken === null) {
+                            refreshingToken = auth.refreshIdToken(refreshToken).then(function (idToken) {
+                                store.set('token', idToken);
+                                auth.authenticate(store.get('profile'), idToken);
+                            }).finally(function () {
+                                refreshingToken = null;
+                            });
+                        }
+                        return refreshingToken;
+                    } else {
+                        $location.path('/login');
+                    }
+                }
+            }
+
+        });
+    })
+
+    .config(function ($stateProvider, $urlRouterProvider, authProvider) {
+
+        // Ionic uses AngularUI Router which uses the concept of states
+        // Learn more here: https://github.com/angular-ui/ui-router
+        // Set up the various states which the app can be in.
+        // Each state's controller can be found in controllers.js
+        $stateProvider
+
+            // setup an abstract state for the tabs directive
+            .state('tab', {
+                url: '/tab',
+                abstract: true,
+                templateUrl: 'templates/tabs.html'
+            })
+
+            // login
+            .state('login', {
+                url: "/login",
+                templateUrl: "templates/login.html",
+                controller: 'LoginCtrl'
+            })
+
+            // Each tab has its own nav history stack:
+
+            .state('tab.dash', {
+                url: '/dash',
+                views: {
+                    'tab-dash': {
+                        templateUrl: 'templates/tab-dash.html',
+                        controller: 'DashCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                }
+            })
+
+            .state('tab.chats', {
+                url: '/chats',
+                views: {
+                    'tab-chats': {
+                        templateUrl: 'templates/tab-chats.html',
+                        controller: 'ChatsCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                }
+            })
+            .state('tab.chat-detail', {
+                url: '/chats/:chatId',
+                views: {
+                    'tab-chats': {
+                        templateUrl: 'templates/chat-detail.html',
+                        controller: 'ChatDetailCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                }
+            })
+
+            .state('tab.account', {
+                url: '/account',
+                views: {
+                    'tab-account': {
+                        templateUrl: 'templates/tab-account.html',
+                        controller: 'AccountCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                }
+            })
+
+            .state('tab.more-thing', {
+                url: '/more-thing',
+                views: {
+                    'tab-more-thing': {
+                        templateUrl: 'templates/tab-more-thing.html',
+                        controller: 'moreCtrl'
+                    }
+                }
             });
-          }
-          return refreshingToken;
-        } else {
-          $location.path('/login');
-        }
-      }
-    }
 
-  });
-})
+        authProvider.init({
+            domain: 'giv-android.auth0.com',
+            clientID: 'UrHcyqs7QmCNLNHCmoVvNq0xLetb7Op9',
+            loginState: 'login'
+        });
+        // if none of the above states are matched, use this as the fallback
+        $urlRouterProvider.otherwise('/tab/chats');
 
-.config(function($stateProvider, $urlRouterProvider, authProvider) {
-
-  // Ionic uses AngularUI Router which uses the concept of states
-  // Learn more here: https://github.com/angular-ui/ui-router
-  // Set up the various states which the app can be in.
-  // Each state's controller can be found in controllers.js
-  $stateProvider
-
-  // setup an abstract state for the tabs directive
-    .state('tab', {
-    url: '/tab',
-    abstract: true,
-    templateUrl: 'templates/tabs.html'
-  })
-
-    // login
-    .state('login', {
-      url: "/login",
-      templateUrl: "templates/login.html",
-      controller: 'LoginCtrl'
     })
-
-  // Each tab has its own nav history stack:
-
-  .state('tab.dash', {
-    url: '/dash',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/tab-dash.html',
-        controller: 'DashCtrl'
-      }
-    },
-    data: {
-      // This tells Auth0 that this state requires the user to be logged in.
-      // If the user isn't logged in and he tries to access this state
-      // he'll be redirected to the login page
-      requiresLogin: true
-    }
-  })
-
-  .state('tab.chats', {
-      url: '/chats',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
-        }
-      }
-    })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
-        }
-      }
-    })
-
-  .state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
-      }
-    }
-  })
-
-  .state('tab.more-thing', {
-    url: '/more-thing',
-    views: {
-      'tab-more-thing': {
-        templateUrl: 'templates/tab-more-thing.html',
-        controller: 'moreCtrl'
-      }
-    }
-  });
-
-  authProvider.init({
-    domain: 'giv-android.auth0.com',
-    clientID: 'UrHcyqs7QmCNLNHCmoVvNq0xLetb7Op9',
-    loginState: 'login'
-  });
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
-
-})
 
 .config(function (authProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
 
@@ -163,11 +200,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
     }
   };
     $httpProvider.interceptors.push('jwtInterceptor');
-})
-
-.run(function(auth) {
-  // This hooks all auth events to check everything as soon as the app starts
-  auth.hookEvents();
 });
 
+//global variable for firebase
 var user = new Firebase("https://giv.firebaseio.com/userdata");

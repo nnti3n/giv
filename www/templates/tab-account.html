@@ -1,9 +1,27 @@
 <ion-view view-title="Account">
   <ion-content>
     <ion-list>
-      <ion-toggle  ng-model="settings.enableFriends">
-          Enable Friends
-      </ion-toggle>
+      <!--<ion-toggle  ng-model="settings.enableFriends">-->
+          <!--Enable Friends-->
+      <!--</ion-toggle>-->
+      <div class="list card">
+        <div class="item item-divider">Profile Information</div>
+        <div class="item item-body">
+          <img src="{{auth.profile.picture}}" style="float:left">
+          <div style="margin-left:20px; float:left;">
+            <p>{{auth.profile.name}}</p>
+            <p>{{auth.profile.headline}}</p>
+            <p>{{auth.profile.positions.values[0].company.name}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="item item-button-right">
+        Update Position
+        <button class="button button-positive" ng-click="refresh()">
+          <i class="icon ion-loop"></i>
+        </button>
+      </div>
       <div class="item item-button-right">
         Logout
         <button class="button button-positive" ng-click="logout()">
