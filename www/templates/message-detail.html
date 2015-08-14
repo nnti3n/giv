@@ -1,0 +1,89 @@
+<ion-view cache-view="false" view-title="{{ chat_mate.full_name }}">
+    <pre>&lt;div scroll-glue="glued"/&gt;</pre>
+    <ion-content has-bouncing="true" delegate-handle="userMessageScroll">
+        <ion-list>
+            <ion-item ng-hide="chats" class="textCenter">
+                <i class="icon ion-loading-c"></i> Loading Chats
+            </ion-item>
+            <ion-item ng-if="chats.length == 0" class="textCenter">
+                <h4>No messages in this room. Send message to start.</h4>
+            </ion-item>
+            <div ng-repeat="chat in chats | orderBy:'time':false" type="item-text-wrap">
+
+                <div ng-if="chat.from !== user.id">
+
+                    <img  class="profile-pic left"
+                         ng-src="{{chat_mate.picture}}" onerror="onProfilePicError(this)" />
+
+                    <div class="chat-bubble left">
+
+                        <div class="message" ng-bind-html="chat.content" autolinker>
+                        </div>
+
+                        <div class="message-detail">
+                              <span
+                                    class="bold">{{chat_mate.full_name}}</span>,
+                            <span am-time-ago="chat.time"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div ng-if="chat.from === user.id">
+
+                    <img  class="profile-pic right"
+                         ng-src="{{user.picture}}" onerror="onProfilePicError(this)" />
+
+                    <div class="chat-bubble right">
+
+                        <div class="message" ng-bind-html="chat.content" autolinker>
+                        </div>
+
+                        <div class="message-detail">
+                              <span
+                                    class="bold">{{user.name}}</span>,
+                            <span am-time-ago="chat.time"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="cf"></div>
+
+            </div>
+
+
+        </ion-list>
+        <!--<ion-list ng-hide="roomName">-->
+            <!--<ion-item class="textCenter">-->
+                <!--<h4>Please select a room to chat first.</h4>-->
+            <!--</ion-item>-->
+        <!--</ion-list>-->
+
+
+        <!--<ion-item class="item item-input-inset">-->
+            <!--<label class="item-input-wrapper">-->
+                <!--<input type="text" ng-model="IM.message_detail" placeholder="Type in your message...">-->
+            <!--</label>-->
+            <!--<button ng-click="sendMessage(chat_mate.id)" class="button button-small button-balanced">-->
+                <!--Send-->
+            <!--</button>-->
+        <!--</ion-item>-->
+
+    </ion-content>
+
+    <form name="sendMessageForm" ng-submit="sendMessage(chat_mate.id)" novalidate>
+        <ion-footer-bar class="bar-stable item-input-inset message-footer" keyboard-attach>
+            <label class="item-input-wrapper">
+                <textarea cols="50" ng-model="IM.message_detail" value="" placeholder="Send {{chat_mate.full_name}} a message..." required minlength="1" maxlength="1500" msd-elastic></textarea>
+            </label>
+            <div class="footer-btn-wrap">
+                <button class="button button-icon icon ion-android-send footer-btn" type="submit"
+                        ng-disabled="!IM.message_detail || IM.message_detail === ''">
+                </button>
+            </div>
+        </ion-footer-bar>
+    </form>
+
+</ion-view>

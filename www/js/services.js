@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
 
-    .factory('Chats', function (store) {
+    .factory('Givs', function (store) {
         //calculate distance by km
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371; // Radius of the earth in km
@@ -39,19 +39,19 @@ angular.module('starter.services', [])
             //distance: function () {
             //    return chats;
             //},
-            remove: function (chat) {
-                chats.splice(chats.indexOf(chat), 1);
+            remove: function (giv) {
+                givs.splice(givs.indexOf(giv), 1);
             },
-            get: function (chatId) {
+            get: function (givId) {
                 //for (var i = 0; i < chats.length; i++) {
                 //  if (chats[i].email === parseInt(chatId)) {
                 //    return chats[i];
                 //  }
                 //}
-                for (var child in chats) {
-                    if (child === chatId) {
-                        console.log(chats[child]);
-                        return chats[child];
+                for (var child in givs) {
+                    if (child === givId) {
+                        console.log(givs[child]);
+                        return givs[child];
                     }
                 }
                 return null;

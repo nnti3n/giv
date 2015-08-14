@@ -3,5 +3,10 @@
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.0.1"
+  },
+  "dependencies": {
+    "angular-moment": "~0.10.2",
+    "Autolinker.js": "~0.18.1",
+    "angular-scroll-glue": "~2.0.6"
   }
 }

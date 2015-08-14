@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'ngCordova'])
+angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'ngCordova', 'angularMoment','monospaced.elastic'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -97,12 +97,12 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
 
             // Each tab has its own nav history stack:
 
-            .state('tab.dash', {
-                url: '/dash',
+            .state('tab.message', {
+                url: '/message',
                 views: {
-                    'tab-dash': {
-                        templateUrl: 'templates/tab-dash.html',
-                        controller: 'DashCtrl'
+                    'tab-message': {
+                        templateUrl: 'templates/tab-message.html',
+                        controller: 'MessageCtrl'
                     }
                 },
                 data: {
@@ -113,12 +113,15 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 }
             })
 
-            .state('tab.chats', {
-                url: '/chats',
+            .state('tab.message-detail', {
+                url: '/message/:roomId',
+                params : {
+                  chat_mate: {array: true}
+                },
                 views: {
-                    'tab-chats': {
-                        templateUrl: 'templates/tab-chats.html',
-                        controller: 'ChatsCtrl'
+                    'tab-message': {
+                        templateUrl: 'templates/message-detail.html',
+                        controller: 'MessageDetailCtrl'
                     }
                 },
                 data: {
@@ -128,12 +131,29 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                     requiresLogin: true
                 }
             })
-            .state('tab.chat-detail', {
-                url: '/chats/:chatId',
+
+            .state('tab.givs', {
+                url: '/givs',
                 views: {
-                    'tab-chats': {
-                        templateUrl: 'templates/chat-detail.html',
-                        controller: 'ChatDetailCtrl'
+                    'tab-givs': {
+                        templateUrl: 'templates/tab-givs.html',
+                        controller: 'GivsCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                }
+            })
+
+            .state('tab.giv-detail', {
+                url: '/givs/:givId',
+                views: {
+                    'tab-givs': {
+                        templateUrl: 'templates/giv-detail.html',
+                        controller: 'GivDetailCtrl'
                     }
                 },
                 data: {
@@ -176,7 +196,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
             loginState: 'login'
         });
         // if none of the above states are matched, use this as the fallback
-        $urlRouterProvider.otherwise('/tab/chats');
+        $urlRouterProvider.otherwise('/tab/givs');
 
     })
 

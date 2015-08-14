@@ -11,10 +11,114 @@ angular.module('starter.controllers', [])
         };
     })
 
-    .controller('DashCtrl', function ($scope, store, auth, $state) {
+    .controller('MessageCtrl', function ($scope, store, auth, $state) {
+        $scope.show();
 
-        //console.log(auth.profile);
-        $scope.auth = auth;
+        //get user_id for local storage to load all user's chat rooms
+        var profile_user = store.get('profile');
+        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
+
+        // list all chat rooms
+        var rooms = [];
+        //search all rooms of user
+        roomsRef_u.on("child_added", function(snapshot) {
+            var chat_room = Object.keys(snapshot.val()); //room id
+            var chat_key = snapshot.key(); // chat mate id
+            console.log(chat_key);
+            //push the chat_mate info
+            user.child("users").child(chat_key).once("value", function (snap_profile) {
+                // push chat mate user profile to array
+                rooms.push(snap_profile.val());
+                var last = snapshot.val()[chat_room].last;
+                var time = new Date(parseInt(last));
+                //add chat mate id and last message to array
+                rooms[rooms.length - 1].room_id = chat_room;
+                rooms[rooms.length - 1].id = chat_key;
+                rooms[rooms.length - 1].time = time.toLocaleDateString() + " " + time.toLocaleTimeString();
+                rooms[rooms.length - 1].last = last;
+                console.log(rooms);
+                $scope.rooms = rooms; // set view to frontend
+                $scope.hide();
+            });
+        });
+        console.log(rooms);
+
+        $scope.openRoom = function (roomId, chat_mate) {
+            console.log(roomId);
+            $state.go('tab.message-detail', {roomId:roomId, chat_mate:chat_mate});
+        };
+
+        $scope.GoToLink = function (url) {
+            window.open(url,'_system', 'location=yes');
+        };
+
+        $scope.hide();
+    })
+
+    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout) {
+        $scope.show();
+        var profile_user = store.get('profile');
+
+        console.log($state.params.roomId);
+        console.log($state.params.chat_mate);
+
+        //take room id from url and pull all chat from room
+        var room_id = $state.params.roomId;
+        $scope.chat_mate = $state.params.chat_mate[0];
+        $scope.user = {};
+        $scope.user.id = profile_user.user_id;
+        $scope.user.name = profile_user.family_name;
+        $scope.user.picture = profile_user.picture;
+
+        //scroll to bottom
+        var viewScroll = $ionicScrollDelegate.$getByHandle('userMessageScroll');
+
+        var chats = [];
+        user.child("rooms").child(room_id).on("child_added", function(chat_snapshot) {
+            chats.push(chat_snapshot.val());
+            $scope.chats = chats;
+            $timeout(function() {
+                viewScroll.scrollBottom();
+            }, 0);
+            console.log(chats);
+            $scope.hide();
+        });
+
+
+
+        $scope.IM = {};
+        $scope.IM.message_detail = '';
+        //send message button
+        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
+        $scope.sendMessage = function (receiver) {
+            // set database url for sender and receiver
+            var roomsRef_r = user.child("users").child(receiver).child("rooms");
+
+            console.log($scope.IM.message_detail);
+            var message_to_send = $scope.IM.message_detail;
+            $scope.IM.message_detail = '';
+
+            //update last message time
+            roomsRef_u.child(receiver).child(room_id).update({"last" : (new Date()).getTime()});
+            roomsRef_r.child(profile_user.user_id).child(room_id).update({"last" : (new Date()).getTime()});
+
+            // if created, add chat to the chatroom
+            user.child("rooms").child(room_id).push({
+                "time" : (new Date()).getTime(),
+                "from" : profile_user.user_id,
+                "to" : receiver,
+                "content" : message_to_send
+            }, function (error) {
+                if (error) {
+                    alert("Your message could not be sent." + error);
+                } else {
+                    console.log("message sent successfully.");
+                }
+            })
+        };
+
+    $scope.hide();
+    //    end of messageDetailCtrl
     })
 
     .controller('moreCtrl', function ($scope) {
@@ -37,7 +141,7 @@ angular.module('starter.controllers', [])
                     api: 'firebase'
                 }).then(function (delegation) {
                     store.set('firebaseToken', delegation.id_token);
-                    $state.go('tab.chats');
+                    $state.go('tab.givs');
                     // save data to firebase
                     // Here we're using the Firebase Token we stored after login
                     user.authWithCustomToken(store.get('firebaseToken'), function (error, auth) {
@@ -92,7 +196,7 @@ angular.module('starter.controllers', [])
         };
     })
 
-    .controller('ChatsCtrl', function ($scope, Chats, $location, store, GPS, $state) {
+    .controller('GivsCtrl', function ($scope, Givs, $location, store, GPS, $state) {
         // With the new view caching in Ionic, Controllers are only called
         // when they are recreated or on app start, instead of every page change.
         // To listen for when this page is active (for example, to refresh data),
@@ -130,7 +234,7 @@ angular.module('starter.controllers', [])
             return 0;
         }
 
-        var chats = [];
+        var givs = [];
         user.child("users_online").on("child_added", function (snapshot) {
             //console.log("a");
             var gps2 = snapshot.val().position;
@@ -138,62 +242,135 @@ angular.module('starter.controllers', [])
             user.child("users").child(snapshot.key()).once("value", function (snap) {
                 //push user online information to array
                 if (snapshot.key() != store.get('profile').user_id) {
-                    chats.push(snap.val());
-                    chats[chats.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
+                    givs.push(snap.val());
+                    givs[givs.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
+                    givs[givs.length - 1].id = snapshot.key();
                 }
-                chats.sort(compare);
-                store.set("chats", chats);
+                //givs.sort(compare);
+                store.set("givs", givs);
+                $scope.givs = givs;
+                console.log($scope.givs);
                 $scope.hide();
             });
         });
 
-        //user.child("users_online").on("value", function (snapshot) {
-        //    //console.log("a");
-        //    var gps2 = snapshot.val().position;
-        //    var gps = store.get('gps');
-        //    user.child("users").child(snapshot.key()).once("value", function (snap) {
-        //        //push user online information to array
-        //        if (snapshot.key() != store.get('profile').user_id) {
-        //            chats.push(snap.val());
-        //            chats[chats.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
-        //        }
-        //        chats.sort(compare);
-        //        //$scope.hide();
-        //    });
+        //user.child("users_online").on("child_removed", function (snapshot) {
+        //    var removed = snapshot.key();
+        //    delete $scope.givs.removed;
+        //    console.log($scope.givs);
         //});
-
-        $scope.chats = chats;
 
         $scope.search = {};
         $scope.search.searchText = "";
         $scope.profile_id = store.get('profile').user_id;
 
-        $scope.doRefresh = function () {
-            GPS.refresh();
-            $scope.$broadcast('scroll.refreshComplete');
-            $scope.$apply();
+        //open item
+        $scope.openGiv = function (givId) {
+          $state.go("tab.giv-detail", {givId: givId})
         };
 
-        $scope.remove = function (chat) {
-            Chats.remove(chat);
+        //pull to refresh
+        $scope.doRefresh = function () {
+            GPS.refresh();
+            //$state.go($state.current, {}, {reload: true});
+            window.location.reload(true);
+            $scope.$broadcast('scroll.refreshComplete');
+            $scope.$apply();
+            $scope.hide();
         };
-        $scope.hide();
+
+        $scope.remove = function (giv) {
+            Givs.remove(giv);
+        };
+        //$scope.hide();
     })
 
     //Detail
-    .controller('ChatDetailCtrl', function ($scope, $stateParams, store) {
+    .controller('GivDetailCtrl', function ($scope, $stateParams, store, $state) {
+        $scope.show();
         //$scope.chat = Chats.get();
-        var chats = store.get('chats');
-        for (var child in chats) {
-            if (child === $stateParams.chatId) {
-                console.log(chats[child]);
-                $scope.chat = chats[child];
-            }
-        }
-        $scope.GoToLink = function (url) {
-            window.open(url,'_system');
+
+        //var givs = store.get('givs');
+        //
+        //for (var child in givs) {
+        //    if (child === $stateParams.givId) {
+        //        console.log(givs[child]);
+        //        $scope.giv = givs[child];
+        //    }
+        //}
+
+        var giv = {};
+        var giv_id = $stateParams.givId;
+
+        user.child("users").child(giv_id).on("value", function(snapshot) {
+            giv = snapshot.val();
+            $scope.giv = giv;
+            console.log(snapshot.val());
+            $scope.hide();
+        });
+
+        //init the scope array
+        $scope.IM = {};
+        $scope.IM.content = '';
+
+        var profile_user = store.get('profile');
+        $scope.sendMessage = function (receiver) {
+            var message_to_send = $scope.IM.content;
+            $scope.IM.content = '';
+            // set database url for sender and receiver
+            var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
+            var roomsRef_r = user.child("users").child(receiver).child("rooms");
+            // watch if chat room is created or not
+            roomsRef_u.child(receiver).once("value", function(snapshot) {
+                if (snapshot.val() == null) {
+
+                    // if not created, generate room id to both receiver and sender user_id->chatter->room_id and last message time
+                    var room_id = roomsRef_u.child(receiver).push({"last" : (new Date()).getTime()}).key();
+                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last" : (new Date()).getTime()});
+
+                    //then push message to chat room
+                    user.child("rooms").child(room_id).push({
+                        "time" : (new Date()).getTime(),
+                        "from" : profile_user.user_id,
+                        "to" : receiver,
+                        "content" : message_to_send
+                    }, function (error) {
+                        if (error) {
+                            alert("Your message could not be sent." + error);
+                        } else {
+                            alert("message sent successfully.");
+                        }
+                    })
+                } else {
+                    var chat_key = Object.keys(snapshot.val());
+
+                    //update last message time
+                    roomsRef_u.child(receiver).child(chat_key[0]).update({"last" : (new Date()).getTime()});
+                    roomsRef_r.child(profile_user.user_id).child(chat_key[0]).update({"last" : (new Date()).getTime()});
+
+                    // if created, add chat to the chatroom
+                    user.child("rooms").child(chat_key[0]).push({
+                        "time" : (new Date()).getTime(),
+                        "from" : profile_user.user_id,
+                        "to" : receiver,
+                        "content" : message_to_send
+                    }, function (error) {
+                        if (error) {
+                            alert("Your message could not be sent." + error);
+                        } else {
+                            alert("message sent successfully.");
+                        }
+                    })
+                }
+            });
         };
-        console.log($stateParams.chatId);
+
+        $scope.GoToLink = function (url) {
+            window.open(url,'_system', 'location=yes');
+            $scope.hide();
+        };
+        console.log($stateParams.givId);
+        //$scope.hide();
     })
 
     //Account
