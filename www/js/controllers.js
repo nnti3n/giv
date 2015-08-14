@@ -219,21 +219,22 @@ angular.module('starter.controllers', [])
                 ;
             var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             var d = R * c; // Distance in km
-            return Math.round(d * 100) / 100;
+            return Math.round(d);
         }
 
         function deg2rad(deg) {
             return deg * (Math.PI / 180);
         }
 
-        function compare(a,b) {
-            if (a.distance < b.distance)
-                return -1;
-            if (a.distance > b.distance)
-                return 1;
-            return 0;
-        }
+        //function compare(a,b) {
+        //    if (a.distance < b.distance)
+        //        return -1;
+        //    if (a.distance > b.distance)
+        //        return 1;
+        //    return 0;
+        //}
 
+        //init data givs
         var givs = [];
         user.child("users_online").on("child_added", function (snapshot) {
             //console.log("a");
@@ -254,11 +255,16 @@ angular.module('starter.controllers', [])
             });
         });
 
-        //user.child("users_online").on("child_removed", function (snapshot) {
-        //    var removed = snapshot.key();
-        //    delete $scope.givs.removed;
-        //    console.log($scope.givs);
-        //});
+        //if one user signout remove from the list
+        user.child("users_online").on("child_removed", function (snapshot) {
+            console.log(snapshot.key());
+            var removed = snapshot.key();
+            var array_removed = $scope.givs
+                .filter(function (el) {
+                    return el.id !== removed;
+                });
+            $scope.givs = array_removed;
+        });
 
         $scope.search = {};
         $scope.search.searchText = "";
@@ -305,7 +311,6 @@ angular.module('starter.controllers', [])
         user.child("users").child(giv_id).on("value", function(snapshot) {
             giv = snapshot.val();
             $scope.giv = giv;
-            console.log(snapshot.val());
             $scope.hide();
         });
 
@@ -314,9 +319,11 @@ angular.module('starter.controllers', [])
         $scope.IM.content = '';
 
         var profile_user = store.get('profile');
-        $scope.sendMessage = function (receiver) {
+        $scope.sendMessage = function () {
+            var receiver = giv_id;
             var message_to_send = $scope.IM.content;
             $scope.IM.content = '';
+
             // set database url for sender and receiver
             var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
             var roomsRef_r = user.child("users").child(receiver).child("rooms");
