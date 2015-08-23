@@ -178,7 +178,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                     // he'll be redirected to the login page
                     requiresLogin: true
                 }
-            })
+            });
 
 
         authProvider.init({

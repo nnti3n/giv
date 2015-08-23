@@ -1,0 +1,30 @@
+<ion-view view-title="GIVers">
+    <ion-content>
+        <ion-list>
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="search.searchText">
+            </label>
+            <ion-refresher pulling-text="Pull to refresh" on-refresh="doRefresh()">
+            </ion-refresher>
+            <ion-item class="item-remove-animate item-avatar item-icon-right"
+                      ng-repeat="(giv_key, value) in givs | filter:search.searchText | orderBy: 'distance':false"
+                      type="item-text-wrap" ng-click="openGiv(value.id)">
+                <img ng-src="{{value.picture}}">
+
+                <h2>{{value.full_name}}</h2>
+
+                <p>{{value.headline}}</p>
+
+                <p>{{"#"+ value.hashtag.hashtag1 + " #" +value.hashtag.hashtag2 + " #" + value.hashtag.hashtag3}}</p>
+
+                <p>Distance: {{value.distance}} Km</p>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+
+                <!--<ion-option-button class="button-positive" ng-click="remove(giv_key)">-->
+                    <!--Favorite-->
+                <!--</ion-option-button>-->
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

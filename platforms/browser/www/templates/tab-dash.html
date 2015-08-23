@@ -1,0 +1,24 @@
+<ion-view view-title="Dashboard">
+  <ion-content class="padding">
+    <div class="list card">
+      <div class="item item-divider">Profile Information</div>
+      <div class="item item-body">
+        <img src="{{auth.profile.picture}}" style="float:left">
+        <div style="margin-left:20px; float:left;">
+          <p>{{auth.profile.name}}</p>
+          <p>{{auth.profile.headline}}</p>
+          <p>{{auth.profile.positions.values[0].company.name}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="list card">
+      <div class="item item-divider">Welcome</div>
+      <div class="item item-body">
+        <div>
+          <span>Hello {{auth.profile.name}} </span>
+          <p>Welcome to GIV.</p>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

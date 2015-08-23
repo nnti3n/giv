@@ -153,8 +153,7 @@ angular.module('starter.controllers', [])
                     });
                     // save info when first login
                     var usersRef = user.child("users").child(auth.profile.user_id);
-                    usersRef.once("value", function (snap) {
-                        if (snap.val() == null) {
+
                             usersRef.set({
                                 "email": auth.profile.email,
                                 "full_name": auth.profile.name,
@@ -162,8 +161,7 @@ angular.module('starter.controllers', [])
                                 "url": auth.profile.publicProfileUrl,
                                 "picture": auth.profile.picture
                             });
-                        }
-                    });
+
                     var users_online = user.child("users_online").child(auth.profile.user_id);
                     //get gps position
                     var gps = {"lat": "", "long": ""};
@@ -308,9 +306,10 @@ angular.module('starter.controllers', [])
         var giv = {};
         var giv_id = $stateParams.givId;
 
-        user.child("users").child(giv_id).on("value", function(snapshot) {
+        user.child("users").child(giv_id).once("value", function(snapshot) {
             giv = snapshot.val();
             $scope.giv = giv;
+            $scope.$digest();
             $scope.hide();
         });
 

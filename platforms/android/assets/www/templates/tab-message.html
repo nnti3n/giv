@@ -1,0 +1,19 @@
+<ion-view cache-view="false" view-title="Messages">
+  <ion-content>
+    <ion-list>
+      <ion-item class="item-icon-left item-avatar" ng-repeat="room in rooms | orderBy: 'last':true" type="item-text-wrap" ng-click="openRoom(room.room_id, room)">
+        <img ng-src="{{room.picture}}"/>
+        <h2 style="margin-left:20px">{{room.full_name}}</h2>
+        <p style="margin-left:20px">{{room.time}}</p>
+        <ion-option-button class="button-positive" ng-click="GoToLink(room.url)">
+        Profile
+        </ion-option-button>
+      </ion-item>
+    </ion-list>
+    <!--<ion-list ng-hide="rooms.length">-->
+      <!--<ion-item class="textCenter">-->
+        <!--<i class="icon ion-loading-c"></i> Loading Rooms-->
+      <!--</ion-item>-->
+    <!--</ion-list>-->
+  </ion-content>
+</ion-view>
