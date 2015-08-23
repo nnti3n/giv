@@ -180,15 +180,6 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 }
             })
 
-            .state('tab.more-thing', {
-                url: '/more-thing',
-                views: {
-                    'tab-more-thing': {
-                        templateUrl: 'templates/tab-more-thing.html',
-                        controller: 'moreCtrl'
-                    }
-                }
-            });
 
         authProvider.init({
             domain: 'giv-android.auth0.com',
