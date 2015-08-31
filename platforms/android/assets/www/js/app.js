@@ -21,6 +21,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 StatusBar.styleLightContent();
             }
 
+            //check internet connection
             if(window.Connection) {
                 if(navigator.connection.type == Connection.NONE) {
                     $ionicPopup.confirm({
@@ -114,9 +115,10 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
             })
 
             .state('tab.message-detail', {
-                url: '/message/:roomId',
+                url: '/message/detail',
                 params : {
-                  chat_mate: {array: true}
+                    chat_mate: null,
+                    roomId: null
                 },
                 views: {
                     'tab-message': {
@@ -145,11 +147,15 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                     // If the user isn't logged in and he tries to access this state
                     // he'll be redirected to the login page
                     requiresLogin: true
-                }
+                },
+                cache: false
             })
 
             .state('tab.giv-detail', {
-                url: '/givs/:givId',
+                url: '/givs/detail',
+                params: {
+                    givId: null
+                },
                 views: {
                     'tab-givs': {
                         templateUrl: 'templates/giv-detail.html',
@@ -162,6 +168,23 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                     // he'll be redirected to the login page
                     requiresLogin: true
                 }
+            })
+
+            .state('tab.favorite', {
+                url: '/favorite',
+                views: {
+                    'tab-favorite': {
+                        templateUrl: 'templates/tab-favorite.html',
+                        controller: 'FavoriteCtrl'
+                    }
+                },
+                data: {
+                    // This tells Auth0 that this state requires the user to be logged in.
+                    // If the user isn't logged in and he tries to access this state
+                    // he'll be redirected to the login page
+                    requiresLogin: true
+                },
+                cache: false
             })
 
             .state('tab.account', {
@@ -178,17 +201,8 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                     // he'll be redirected to the login page
                     requiresLogin: true
                 }
-            })
-
-            .state('tab.more-thing', {
-                url: '/more-thing',
-                views: {
-                    'tab-more-thing': {
-                        templateUrl: 'templates/tab-more-thing.html',
-                        controller: 'moreCtrl'
-                    }
-                }
             });
+
 
         authProvider.init({
             domain: 'giv-android.auth0.com',
@@ -199,6 +213,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
         $urlRouterProvider.otherwise('/tab/givs');
 
     })
+
 
 .config(function (authProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
 

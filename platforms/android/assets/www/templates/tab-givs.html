@@ -5,7 +5,7 @@
                 <i class="icon ion-search placeholder-icon"></i>
                 <input type="text" placeholder="Search" ng-model="search.searchText">
             </label>
-            <ion-refresher pulling-text="Pull to refresh" on-refresh="doRefresh()">
+            <ion-refresher pulling-text="Pull to update data" on-refresh="doRefresh()">
             </ion-refresher>
             <ion-item class="item-remove-animate item-avatar item-icon-right"
                       ng-repeat="(giv_key, value) in givs | filter:search.searchText | orderBy: 'distance':false"

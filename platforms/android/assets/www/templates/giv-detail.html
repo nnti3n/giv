@@ -4,7 +4,8 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{giv.full_name}}">
+<ion-view>
+<ion-nav-title> {{giv.full_name}}</ion-nav-title>
   <ion-content class="padding">
     <div style="min-height:120px;">
       <img href="#" ng-click="GoToLink(giv.url)" ng-src="{{giv.picture}}" style="width: 100px; height: 100px; margin-bottom:20px; margin-right:20px;float:left;">
@@ -14,14 +15,15 @@
       <p>{{"#"+ giv.hashtag.hashtag1 + " #" + giv.hashtag.hashtag2 + " #" + giv.hashtag.hashtag3}}</p>
     </div>
     <div class="card" style="margin:0">
-      <div class="item item-divider">
-        Send Message to this person
-      </div>
-      <label class="item item-input">
-        <textarea ng-model="IM.content" placeholder="Comments" style="min-height:80px;">
-        </textarea>
-      </label>
-      <button class="button button-block button-positive" type="submit" ng-click="sendMessage()" style="width:30%; margin: 0 2.5%;" >Send</button>
+      <!--<div class="item item-divider">-->
+        <!--Send Message to this person-->
+      <!--</div>-->
+      <!--<label class="item item-input">-->
+        <!--<textarea ng-model="IM.content" placeholder="Comments" style="min-height:80px;">-->
+        <!--</textarea>-->
+      <!--</label>-->
+      <button class="button button-block button-positive" type="submit" ng-click="sendMessage(giv)" style="display:inline; width:140px; margin: 0 2.5%;" >Send Message</button>
+      <button class="button button-block button-energized" type="submit" ng-click="favoriteAdd()" style="display:inline; width:140px; margin: 0 2.5%;" >Add to Favorite</button>
     </div>
   </ion-content>
 </ion-view>

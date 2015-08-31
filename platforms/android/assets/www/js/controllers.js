@@ -1,12 +1,12 @@
 angular.module('starter.controllers', [])
 
     .controller('mainController', function ($ionicLoading, $scope) {
-        $scope.show = function() {
+        $scope.show = function () {
             $ionicLoading.show({
                 template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
             });
         };
-        $scope.hide = function(){
+        $scope.hide = function () {
             $ionicLoading.hide();
         };
     })
@@ -20,9 +20,9 @@ angular.module('starter.controllers', [])
 
         // list all chat rooms
         var rooms = [];
-        //search all rooms of user
-        roomsRef_u.on("child_added", function(snapshot) {
-            var chat_room = Object.keys(snapshot.val()); //room id
+        //get all rooms of user
+        roomsRef_u.on("child_added", function (snapshot) {
+            var chat_room = Object.keys(snapshot.val())[0]; //room id
             var chat_key = snapshot.key(); // chat mate id
             console.log(chat_key);
             //push the chat_mate info
@@ -45,83 +45,219 @@ angular.module('starter.controllers', [])
 
         $scope.openRoom = function (roomId, chat_mate) {
             console.log(roomId);
-            $state.go('tab.message-detail', {roomId:roomId, chat_mate:chat_mate});
+            $state.go('tab.message-detail', {roomId: roomId, chat_mate: chat_mate});
         };
 
         $scope.GoToLink = function (url) {
-            window.open(url,'_system', 'location=yes');
+            window.open(url, '_system', 'location=yes');
         };
 
         $scope.hide();
+        //  end of message controller
     })
 
-    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout) {
-        $scope.show();
+    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory) {
+        //$scope.show();
+
+        //$scope.$on('$ionicView.beforeEnter', function (event, viewData) {
+        //    console.log($ionicHistory);
+        //    viewData.enableBack = true;
+        //});
+
         var profile_user = store.get('profile');
 
         console.log($state.params.roomId);
         console.log($state.params.chat_mate);
 
-        //take room id from url and pull all chat from room
-        var room_id = $state.params.roomId;
-        $scope.chat_mate = $state.params.chat_mate[0];
+        //information of both user and chat_mate
+        $scope.chat_mate = $state.params.chat_mate;
         $scope.user = {};
         $scope.user.id = profile_user.user_id;
         $scope.user.name = profile_user.family_name;
         $scope.user.picture = profile_user.picture;
 
-        //scroll to bottom
+        //scroll to bottom in first-load message
         var viewScroll = $ionicScrollDelegate.$getByHandle('userMessageScroll');
 
+        //load chat
         var chats = [];
-        user.child("rooms").child(room_id).on("child_added", function(chat_snapshot) {
-            chats.push(chat_snapshot.val());
-            $scope.chats = chats;
-            $timeout(function() {
-                viewScroll.scrollBottom();
-            }, 0);
-            console.log(chats);
-            $scope.hide();
-        });
 
+        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
 
+        //take chat room id from params or userlist
+        var room_id = null;
+        if ($state.params.roomId) {
+            //navigate from tab-message
+            room_id = $state.params.roomId;
+        }
+        else {
+            //navigate from giv-detail
+            roomsRef_u.child($state.params.chat_mate.id).once("value", function (snapshot) {
+                room_id = Object.keys(snapshot.val())[0];
+                //monitor the chatroom
+                if (room_id) {
+                    user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                        chats.push(chat_snapshot.val());
+                        $scope.chats = chats;
+                        $timeout(function () {
+                            viewScroll.scrollBottom();
+                        }, 0);
+                        console.log(chats);
+                        $scope.hide();
+                    });
+                }
+            });
 
+        }
+
+        console.log(room_id);
+
+        //monitor the chatroom
+        if (room_id) {
+            user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                chats.push(chat_snapshot.val());
+                $scope.chats = chats;
+                $timeout(function () {
+                    viewScroll.scrollBottom();
+                }, 0);
+                console.log(chats);
+                $scope.hide();
+            });
+        }
+
+        //init chat object
         $scope.IM = {};
         $scope.IM.message_detail = '';
+
         //send message button
-        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
         $scope.sendMessage = function (receiver) {
             // set database url for sender and receiver
             var roomsRef_r = user.child("users").child(receiver).child("rooms");
 
-            console.log($scope.IM.message_detail);
             var message_to_send = $scope.IM.message_detail;
             $scope.IM.message_detail = '';
 
-            //update last message time
-            roomsRef_u.child(receiver).child(room_id).update({"last" : (new Date()).getTime()});
-            roomsRef_r.child(profile_user.user_id).child(room_id).update({"last" : (new Date()).getTime()});
-
-            // if created, add chat to the chatroom
-            user.child("rooms").child(room_id).push({
-                "time" : (new Date()).getTime(),
-                "from" : profile_user.user_id,
-                "to" : receiver,
-                "content" : message_to_send
-            }, function (error) {
-                if (error) {
-                    alert("Your message could not be sent." + error);
+            roomsRef_u.child(receiver).once("value", function (snapshot) {
+                console.log(snapshot.val());
+                //room_id =  Object.keys(snapshot.val())[0];
+                var room = snapshot.val();
+                if (room == null) {
+                    // if room is not created, generate chat room id (push) then save time and save room_id to both user's rooms user_id->chatter->room_id
+                    room_id = roomsRef_u.child(receiver).push({"last": (new Date()).getTime()}).key(); //for user
+                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last": (new Date()).getTime()}); //for receiver
+                    var vartemp = 1;
                 } else {
-                    console.log("message sent successfully.");
+                    room_id = Object.keys(snapshot.val())[0];
+                    //update last message time
+                    roomsRef_u.child(receiver).child(room_id).update({"last": (new Date()).getTime()}); //for user
+                    roomsRef_r.child(profile_user.user_id).child(room_id).update({"last": (new Date()).getTime()}); //for receiver
                 }
-            })
+                console.log(room_id);
+
+                // push message, if this is the first time, create room
+                user.child("rooms").child(room_id).push({
+                    "time": (new Date()).getTime(),
+                    "from": profile_user.user_id,
+                    "to": receiver,
+                    "content": message_to_send
+                }, function (error) {
+                    if (error) {
+                        alert("Your message could not be sent." + error);
+                    } else {
+                        console.log("message sent successfully.");
+                    }
+                });
+
+                //if room is created first time, monitor room
+                if (vartemp == 1) {
+                    console.log('run');
+                    user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                        chats.push(chat_snapshot.val());
+                        $scope.chats = chats;
+                        $timeout(function () {
+                            viewScroll.scrollBottom();
+                        }, 0);
+                        console.log(chats);
+                        $scope.hide();
+                    });
+                }
+            });
+
         };
 
-    $scope.hide();
-    //    end of messageDetailCtrl
+        //add favorite user
+        $scope.favoriteAdd = function () {
+            var json_id = {};
+            json_id[profile_user.user_id] = true;
+            user.child("users").child(profile_user.user_id).child("favorite").update(json_id);
+        };
+
+        $scope.GoBack = function () {
+            $state.go("tab.message");
+        };
+
+        //$scope.hide();
+        //    end of messageDetailCtrl
     })
 
-    .controller('moreCtrl', function ($scope) {
+    .controller('FavoriteCtrl', function ($scope, store, $state, GPS) {
+
+        $scope.show();
+
+        //init data favs
+        var favs = [];
+
+        var profile_id = store.get('profile').user_id;
+        user.child("users").child(profile_id).child("favorite").on("child_added", function (snapshot) {
+            //console.log("a");
+            //var gps2 = snapshot.val().position;
+            //var gps = store.get('gps');
+
+            user.child("users").child(snapshot.key()).once("value", function (snap) {
+                //push user online information to array
+                if (snapshot.key() != profile_id) {
+                    favs.push(snap.val());
+                    //favs[favs.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
+                    favs[favs.length - 1].id = snapshot.key();
+                }
+                $scope.favs = favs;
+                console.log($scope.favs);
+                $scope.hide();
+            });
+        });
+
+        //if one user signout remove from the list
+        $scope.remove = function (removed_id) {
+            user.child("users").child("favorite").update({removed_id: null});
+
+            //remove id from $scope.favs
+            $scope.favs = $scope.favs
+                .filter(function (el) {
+                    return el.id !== removed_id;
+                });
+
+        };
+
+        $scope.search = {};
+        $scope.search.searchText = "";
+        $scope.profile_id = store.get('profile').user_id;
+
+        //open item
+        $scope.openGiv = function (givId) {
+            $state.go("tab.giv-detail", {givId: givId})
+        };
+
+        //pull to refresh
+        $scope.doRefresh = function () {
+            GPS.refresh();
+            //refresh state
+            $state.transitionTo($state.current, $state.$current.params, {reload: true, inherit: true, notify: true});
+            $scope.$broadcast('scroll.refreshComplete');
+            $scope.hide();
+        };
+
+        $scope.hide();
+        //    end of FavoriteCtrl
     })
 
     .controller('LoginCtrl', function (store, $scope, $location, auth, $state, $firebase, $cordovaGeolocation) {
@@ -151,19 +287,18 @@ angular.module('starter.controllers', [])
                         }
                         else console.log(auth);
                     });
-                    // save info when first login
+
+                    // save info everytime user login
                     var usersRef = user.child("users").child(auth.profile.user_id);
-                    usersRef.once("value", function (snap) {
-                        if (snap.val() == null) {
-                            usersRef.set({
-                                "email": auth.profile.email,
-                                "full_name": auth.profile.name,
-                                "headline": auth.profile.headline,
-                                "url": auth.profile.publicProfileUrl,
-                                "picture": auth.profile.picture
-                            });
-                        }
+                    usersRef.set({
+                        "email": auth.profile.email,
+                        "full_name": auth.profile.name,
+                        "headline": auth.profile.headline,
+                        "url": auth.profile.publicProfileUrl,
+                        "picture": auth.profile.picture
                     });
+
+
                     var users_online = user.child("users_online").child(auth.profile.user_id);
                     //get gps position
                     var gps = {"lat": "", "long": ""};
@@ -236,6 +371,7 @@ angular.module('starter.controllers', [])
 
         //init data givs
         var givs = [];
+
         user.child("users_online").on("child_added", function (snapshot) {
             //console.log("a");
             var gps2 = snapshot.val().position;
@@ -244,21 +380,24 @@ angular.module('starter.controllers', [])
                 //push user online information to array
                 if (snapshot.key() != store.get('profile').user_id) {
                     givs.push(snap.val());
+                    //add distance to each object
                     givs[givs.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
+                    //add id for load profile in detail view
                     givs[givs.length - 1].id = snapshot.key();
                 }
                 //givs.sort(compare);
-                store.set("givs", givs);
+
                 $scope.givs = givs;
-                console.log($scope.givs);
                 $scope.hide();
             });
         });
 
-        //if one user signout remove from the list
+        //if one user signout, then remove from the givs[] array scope
         user.child("users_online").on("child_removed", function (snapshot) {
             console.log(snapshot.key());
             var removed = snapshot.key();
+
+            //remove id from $scope.givs
             var array_removed = $scope.givs
                 .filter(function (el) {
                     return el.id !== removed;
@@ -272,54 +411,65 @@ angular.module('starter.controllers', [])
 
         //open item
         $scope.openGiv = function (givId) {
-          $state.go("tab.giv-detail", {givId: givId})
+            $state.go("tab.giv-detail", {givId: givId})
         };
 
         //pull to refresh
         $scope.doRefresh = function () {
             GPS.refresh();
-            //$state.go($state.current, {}, {reload: true});
-            window.location.reload(true);
+            //refresh state
+            $state.transitionTo($state.current, $state.$current.params, {reload: true, inherit: true, notify: true});
             $scope.$broadcast('scroll.refreshComplete');
-            $scope.$apply();
             $scope.hide();
         };
 
-        $scope.remove = function (giv) {
-            Givs.remove(giv);
-        };
-        //$scope.hide();
+        $scope.hide();
     })
 
     //Detail
     .controller('GivDetailCtrl', function ($scope, $stateParams, store, $state) {
         $scope.show();
-        //$scope.chat = Chats.get();
-
-        //var givs = store.get('givs');
-        //
-        //for (var child in givs) {
-        //    if (child === $stateParams.givId) {
-        //        console.log(givs[child]);
-        //        $scope.giv = givs[child];
-        //    }
-        //}
 
         var giv = {};
-        var giv_id = $stateParams.givId;
+        var giv_id = $state.params.givId;
 
-        user.child("users").child(giv_id).on("value", function(snapshot) {
+        user.child("users").child(giv_id).once("value", function (snapshot) {
             giv = snapshot.val();
+            //id for message purpose
+            giv.id = giv_id;
+            console.log(giv);
             $scope.giv = giv;
+            $scope.$digest();
             $scope.hide();
         });
+
 
         //init the scope array
         $scope.IM = {};
         $scope.IM.content = '';
 
         var profile_user = store.get('profile');
-        $scope.sendMessage = function () {
+
+        //send message
+        $scope.sendMessage = function (chat_mate) {
+            $state.go('tab.message-detail', {chat_mate: chat_mate});
+        };
+
+        //add favorite user
+        $scope.favoriteAdd = function () {
+            var json_id = {};
+            json_id[giv_id] = true;
+            user.child("users").child(profile_user.user_id).child("favorite").update(json_id, function (error) {
+                if (error) {
+                    alert("Your message could not be sent." + error);
+                } else {
+                    alert("add to favorite successfully.");
+                }
+            });
+        };
+
+        //old send message
+        $scope.sendMessageOld = function () {
             var receiver = giv_id;
             var message_to_send = $scope.IM.content;
             $scope.IM.content = '';
@@ -328,19 +478,19 @@ angular.module('starter.controllers', [])
             var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
             var roomsRef_r = user.child("users").child(receiver).child("rooms");
             // watch if chat room is created or not
-            roomsRef_u.child(receiver).once("value", function(snapshot) {
+            roomsRef_u.child(receiver).once("value", function (snapshot) {
                 if (snapshot.val() == null) {
 
-                    // if not created, generate room id to both receiver and sender user_id->chatter->room_id and last message time
-                    var room_id = roomsRef_u.child(receiver).push({"last" : (new Date()).getTime()}).key();
-                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last" : (new Date()).getTime()});
+                    // if room is not created, generate room id for the chat room with time user_id->chatter->room_id and save room_id to both user's rooms
+                    var room_id = roomsRef_u.child(receiver).push({"last": (new Date()).getTime()}).key();
+                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last": (new Date()).getTime()});
 
-                    //then push message to chat room
+                    //then push message to chat room (and create room)
                     user.child("rooms").child(room_id).push({
-                        "time" : (new Date()).getTime(),
-                        "from" : profile_user.user_id,
-                        "to" : receiver,
-                        "content" : message_to_send
+                        "time": (new Date()).getTime(),
+                        "from": profile_user.user_id,
+                        "to": receiver,
+                        "content": message_to_send
                     }, function (error) {
                         if (error) {
                             alert("Your message could not be sent." + error);
@@ -351,16 +501,16 @@ angular.module('starter.controllers', [])
                 } else {
                     var chat_key = Object.keys(snapshot.val());
 
-                    //update last message time
-                    roomsRef_u.child(receiver).child(chat_key[0]).update({"last" : (new Date()).getTime()});
-                    roomsRef_r.child(profile_user.user_id).child(chat_key[0]).update({"last" : (new Date()).getTime()});
+                    //update last message time for message tab time order
+                    roomsRef_u.child(receiver).child(chat_key[0]).update({"last": (new Date()).getTime()});
+                    roomsRef_r.child(profile_user.user_id).child(chat_key[0]).update({"last": (new Date()).getTime()});
 
-                    // if created, add chat to the chatroom
+                    // if room is created, add chat to the chatroom
                     user.child("rooms").child(chat_key[0]).push({
-                        "time" : (new Date()).getTime(),
-                        "from" : profile_user.user_id,
-                        "to" : receiver,
-                        "content" : message_to_send
+                        "time": (new Date()).getTime(),
+                        "from": profile_user.user_id,
+                        "to": receiver,
+                        "content": message_to_send
                     }, function (error) {
                         if (error) {
                             alert("Your message could not be sent." + error);
@@ -373,10 +523,10 @@ angular.module('starter.controllers', [])
         };
 
         $scope.GoToLink = function (url) {
-            window.open(url,'_system', 'location=yes');
+            window.open(url, '_system', 'location=yes');
             $scope.hide();
         };
-        console.log($stateParams.givId);
+        console.log($state.params.givId);
         //$scope.hide();
     })
 

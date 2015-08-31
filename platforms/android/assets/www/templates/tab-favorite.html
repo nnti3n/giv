@@ -1,4 +1,4 @@
-<ion-view view-title="GIVers">
+<ion-view view-title="Favorite">
     <ion-content>
         <ion-list>
             <label class="item item-input">
@@ -8,7 +8,7 @@
             <ion-refresher pulling-text="Pull to update data" on-refresh="doRefresh()">
             </ion-refresher>
             <ion-item class="item-remove-animate item-avatar item-icon-right"
-                      ng-repeat="(giv_key, value) in givs | filter:search.searchText | orderBy: 'distance':false"
+                      ng-repeat="(giv_key, value) in favs | filter:search.searchText | orderBy: 'distance':false"
                       type="item-text-wrap" ng-click="openGiv(value.id)">
                 <img ng-src="{{value.picture}}">
 
@@ -18,11 +18,11 @@
 
                 <p>{{"#"+ value.hashtag.hashtag1 + " #" +value.hashtag.hashtag2 + " #" + value.hashtag.hashtag3}}</p>
 
-                <p>Distance: {{value.distance}} Km</p>
+                <!--<p>Distance: {{value.distance}} Km</p>-->
                 <i class="icon ion-chevron-right icon-accessory"></i>
 
                 <!--<ion-option-button class="button-positive" ng-click="remove(giv_key)">-->
-                    <!--Favorite-->
+                <!--Favorite-->
                 <!--</ion-option-button>-->
             </ion-item>
         </ion-list>

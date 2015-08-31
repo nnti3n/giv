@@ -1,10 +1,16 @@
-<ion-view cache-view="false" view-title="{{ chat_mate.full_name }}">
+<ion-view cache-view="false">
+    <ion-nav-back-button class="button-clear"
+                         ng-click="GoBack()">
+        <i class="ion-arrow-left-c"></i> Back
+    </ion-nav-back-button>
+
+    <ion-nav-title> {{chat_mate.full_name}}</ion-nav-title>
     <pre>&lt;div scroll-glue="glued"/&gt;</pre>
     <ion-content has-bouncing="true" delegate-handle="userMessageScroll">
         <ion-list>
-            <ion-item ng-hide="chats" class="textCenter">
-                <i class="icon ion-loading-c"></i> Loading Chats
-            </ion-item>
+            <!--<ion-item ng-hide="chats" class="textCenter">-->
+                <!--<i class="icon ion-loading-c"></i> Loading Chats-->
+            <!--</ion-item>-->
             <ion-item ng-if="chats.length == 0" class="textCenter">
                 <h4>No messages in this room. Send message to start.</h4>
             </ion-item>
