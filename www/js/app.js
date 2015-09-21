@@ -21,6 +21,16 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 StatusBar.styleLightContent();
             }
 
+            //  cross race fix
+            if ('cordova' in window) {
+                // Create a sticky event for handling the app being opened via a custom URL
+                cordova.addStickyDocumentEventHandler('handleopenurl');
+            }
+
+            function handleOpenURL (url) {
+                cordova.fireDocumentEvent('handleopenurl', { url: url });
+            }
+
             //check internet connection
             if(window.Connection) {
                 if(navigator.connection.type == Connection.NONE) {
@@ -114,8 +124,9 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 }
             })
 
-            .state('tab.message-detail', {
+            .state('tab.message/message-detail', {
                 url: '/message/detail',
+
                 params : {
                     chat_mate: null,
                     roomId: null
@@ -239,3 +250,4 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
 
 //global variable for firebase
 var user = new Firebase("https://giv.firebaseio.com/userdata");
+

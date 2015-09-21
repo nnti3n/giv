@@ -2,3 +2,6 @@
 # http://git-scm.com/docs/gitignore
 
 node_modules/
+platforms/
+backButtonDirective.js
+OpenUrlService.js

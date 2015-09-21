@@ -45,7 +45,7 @@ angular.module('starter.controllers', [])
 
         $scope.openRoom = function (roomId, chat_mate) {
             console.log(roomId);
-            $state.go('tab.message-detail', {roomId: roomId, chat_mate: chat_mate});
+            $state.go('tab.message/message-detail', {roomId: roomId, chat_mate: chat_mate});
         };
 
         $scope.GoToLink = function (url) {
@@ -59,10 +59,10 @@ angular.module('starter.controllers', [])
     .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory) {
         //$scope.show();
 
-        //$scope.$on('$ionicView.beforeEnter', function (event, viewData) {
-        //    console.log($ionicHistory);
-        //    viewData.enableBack = true;
-        //});
+        $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
+            console.log($ionicHistory);
+            viewData.enableBack = true;
+        });
 
         var profile_user = store.get('profile');
 
@@ -117,6 +117,7 @@ angular.module('starter.controllers', [])
             user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
                 chats.push(chat_snapshot.val());
                 $scope.chats = chats;
+                //scroll when new message
                 $timeout(function () {
                     viewScroll.scrollBottom();
                 }, 0);
@@ -165,6 +166,12 @@ angular.module('starter.controllers', [])
                         alert("Your message could not be sent." + error);
                     } else {
                         console.log("message sent successfully.");
+                        //user.child("users_online").child(receiver).once(function(snap) {
+                        //    var login = snap.val();
+                        //    if (login != null) {
+                        //
+                        //    }
+                        //});
                     }
                 });
 
@@ -174,6 +181,7 @@ angular.module('starter.controllers', [])
                     user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
                         chats.push(chat_snapshot.val());
                         $scope.chats = chats;
+                        //scroll when new message
                         $timeout(function () {
                             viewScroll.scrollBottom();
                         }, 0);
@@ -226,9 +234,9 @@ angular.module('starter.controllers', [])
             });
         });
 
-        //if one user signout remove from the list
+        //remove one from favorite
         $scope.remove = function (removed_id) {
-            user.child("users").child("favorite").update({removed_id: null});
+            user.child("users").child("favorite").child(removed_id).update({});
 
             //remove id from $scope.favs
             $scope.favs = $scope.favs
@@ -290,7 +298,7 @@ angular.module('starter.controllers', [])
 
                     // save info everytime user login
                     var usersRef = user.child("users").child(auth.profile.user_id);
-                    usersRef.set({
+                    usersRef.update({
                         "email": auth.profile.email,
                         "full_name": auth.profile.name,
                         "headline": auth.profile.headline,
@@ -331,7 +339,7 @@ angular.module('starter.controllers', [])
         };
     })
 
-    .controller('GivsCtrl', function ($scope, Givs, $location, store, GPS, $state) {
+    .controller('GivsCtrl', function ($scope, Givs, $location, store, GPS, $state, $timeout) {
         // With the new view caching in Ionic, Controllers are only called
         // when they are recreated or on app start, instead of every page change.
         // To listen for when this page is active (for example, to refresh data),
@@ -414,6 +422,12 @@ angular.module('starter.controllers', [])
             $state.go("tab.giv-detail", {givId: givId})
         };
 
+        //sendMessage
+        $scope.openRoom = function (chat_mate) {
+            console.log(roomId);
+            $state.go('tab.message/message-detail', {chat_mate: chat_mate});
+        };
+
         //pull to refresh
         $scope.doRefresh = function () {
             GPS.refresh();
@@ -452,7 +466,7 @@ angular.module('starter.controllers', [])
 
         //send message
         $scope.sendMessage = function (chat_mate) {
-            $state.go('tab.message-detail', {chat_mate: chat_mate});
+            $state.go('tab.message/message-detail', {chat_mate: chat_mate});
         };
 
         //add favorite user
@@ -592,3 +606,4 @@ angular.module('starter.controllers', [])
         };
         $scope.hide();
     });
+

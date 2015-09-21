@@ -59,10 +59,10 @@ angular.module('starter.controllers', [])
     .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory) {
         //$scope.show();
 
-        //$scope.$on('$ionicView.beforeEnter', function (event, viewData) {
-        //    console.log($ionicHistory);
-        //    viewData.enableBack = true;
-        //});
+        $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
+            console.log($ionicHistory);
+            viewData.enableBack = true;
+        });
 
         var profile_user = store.get('profile');
 

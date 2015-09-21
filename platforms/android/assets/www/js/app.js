@@ -116,6 +116,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
 
             .state('tab.message-detail', {
                 url: '/message/detail',
+
                 params : {
                     chat_mate: null,
                     roomId: null
