@@ -5,7 +5,7 @@
           <!--Enable Friends-->
       <!--</ion-toggle>-->
       <div class="list card">
-        <div class="item item-divider">Profile Information</div>
+        <div class="item item-divider">Profile</div>
         <div class="item item-body">
           <img src="{{auth.profile.picture}}" style="float:left">
           <div style="margin-left:20px; float:left;">
@@ -23,14 +23,8 @@
         <!--</button>-->
       <!--</div>-->
 
-      <div class="item item-button-right">
-        Logout
-        <button class="button button-positive" ng-click="logout()">
-          <i class="icon ion-log-out"></i>
-        </button>
-      </div>
 
-      <h4 style="margin:15px; padding-top:30px;">Input Hashtag</h4>
+      <h4 style="margin:15px; padding-top:30px;">Personal Hashtags</h4>
       <div class="list list-inset">
         <label class="item item-input">
           <input type="text" placeholder="Hashtag #1" ng-model="hashtag.hashtag1">
@@ -43,6 +37,13 @@
         </label>
       </div>
       <button class="button button-block button-positive" type="submit" ng-click="submit_hash()" style=" width: 95%;margin: 0 2.5%;" >Update</button>
+
+      <div style="margin-top:45px;" class="item item-button-right">
+        Logout
+        <button class="button button-positive" ng-click="logout()">
+          <i class="icon ion-log-out"></i>
+        </button>
+      </div>
 
     </ion-list>
   </ion-content>

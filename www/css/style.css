@@ -195,3 +195,25 @@ a.autolinker {
 .loader .ion-loading-c {
     font-size: 64px;
 }
+
+.login-background {
+    background-image: url(../img/background.jpg);
+    position: relative;
+}
+
+.login-button {
+    position: absolute;
+    bottom: 12%;
+    left:0;
+    right:0;
+    margin:auto;
+    width:300px;
+    background:transparent;
+    box-shadow:none;
+}
+
+.login-button-inside {
+    color: black !important;
+    margin:0;
+    border-radius: 25px;
+}

@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'ngCordova', 'angularMoment','monospaced.elastic'])
+angular.module('starter', ['ionic','ionic.service.core','ngCordova','ionic.service.push',   'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt',  'angularMoment','monospaced.elastic'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -19,6 +19,16 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
             if (window.StatusBar) {
                 // org.apache.cordova.statusbar required
                 StatusBar.styleLightContent();
+            }
+
+            //  cross race fix
+            if ('cordova' in window) {
+                // Create a sticky event for handling the app being opened via a custom URL
+                cordova.addStickyDocumentEventHandler('handleopenurl');
+            }
+
+            function handleOpenURL (url) {
+                cordova.fireDocumentEvent('handleopenurl', { url: url });
             }
 
             //check internet connection
@@ -114,7 +124,7 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
                 }
             })
 
-            .state('tab.message-detail', {
+            .state('tab.message/message-detail', {
                 url: '/message/detail',
 
                 params : {
@@ -240,3 +250,4 @@ angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.
 
 //global variable for firebase
 var user = new Firebase("https://giv.firebaseio.com/userdata");
+

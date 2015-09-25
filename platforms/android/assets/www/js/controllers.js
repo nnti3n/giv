@@ -29,12 +29,14 @@ angular.module('starter.controllers', [])
             user.child("users").child(chat_key).once("value", function (snap_profile) {
                 // push chat mate user profile to array
                 rooms.push(snap_profile.val());
+                var seen = snapshot.val()[chat_room].seen;
                 var last = snapshot.val()[chat_room].last;
                 var time = new Date(parseInt(last));
                 //add chat mate id and last message to array
                 rooms[rooms.length - 1].room_id = chat_room;
                 rooms[rooms.length - 1].id = chat_key;
                 rooms[rooms.length - 1].time = time.toLocaleDateString() + " " + time.toLocaleTimeString();
+                rooms[rooms.length - 1].seen = seen;
                 rooms[rooms.length - 1].last = last;
                 console.log(rooms);
                 $scope.rooms = rooms; // set view to frontend
@@ -45,7 +47,7 @@ angular.module('starter.controllers', [])
 
         $scope.openRoom = function (roomId, chat_mate) {
             console.log(roomId);
-            $state.go('tab.message-detail', {roomId: roomId, chat_mate: chat_mate});
+            $state.go('tab.message/message-detail', {roomId: roomId, chat_mate: chat_mate});
         };
 
         $scope.GoToLink = function (url) {
@@ -56,7 +58,7 @@ angular.module('starter.controllers', [])
         //  end of message controller
     })
 
-    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory) {
+    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http) {
         //$scope.show();
 
         $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
@@ -89,6 +91,24 @@ angular.module('starter.controllers', [])
         if ($state.params.roomId) {
             //navigate from tab-message
             room_id = $state.params.roomId;
+            //monitor the chatroom
+            if (room_id) {
+                user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                    //push message to scope
+                    chats.push(chat_snapshot.val());
+                    $scope.chats = chats;
+                    //change message status to seen
+                    roomsRef_u.child($state.params.chat_mate.id).child(room_id).update({
+                        "seen": true
+                    });
+                    //roomsRef_u.update({"all_seen": false});
+                    //scroll when new message
+                    $timeout(function () {
+                        viewScroll.scrollBottom();
+                    }, 0);
+                    $scope.hide();
+                });
+            }
         }
         else {
             //navigate from giv-detail
@@ -97,12 +117,18 @@ angular.module('starter.controllers', [])
                 //monitor the chatroom
                 if (room_id) {
                     user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                        //push message to scope
                         chats.push(chat_snapshot.val());
                         $scope.chats = chats;
+                        //change message status to seen
+                        roomsRef_u.child($state.params.chat_mate.id).child(room_id).update({
+                            "seen": true
+                        });
+                        //roomsRef_u.update({"all_seen": false});
+                        //scroll when new message
                         $timeout(function () {
                             viewScroll.scrollBottom();
                         }, 0);
-                        console.log(chats);
                         $scope.hide();
                     });
                 }
@@ -111,19 +137,6 @@ angular.module('starter.controllers', [])
         }
 
         console.log(room_id);
-
-        //monitor the chatroom
-        if (room_id) {
-            user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
-                chats.push(chat_snapshot.val());
-                $scope.chats = chats;
-                $timeout(function () {
-                    viewScroll.scrollBottom();
-                }, 0);
-                console.log(chats);
-                $scope.hide();
-            });
-        }
 
         //init chat object
         $scope.IM = {};
@@ -144,13 +157,24 @@ angular.module('starter.controllers', [])
                 if (room == null) {
                     // if room is not created, generate chat room id (push) then save time and save room_id to both user's rooms user_id->chatter->room_id
                     room_id = roomsRef_u.child(receiver).push({"last": (new Date()).getTime()}).key(); //for user
-                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last": (new Date()).getTime()}); //for receiver
+                    roomsRef_r.child(profile_user.user_id).child(room_id).set({
+                        "last": (new Date()).getTime(),
+                        "seen": false
+                    }); //for receiver
+                    //update seen for tab button and main controller
+                    roomsRef_u.update({"all_seen": false});
+                    // temp variable for monitor room first time
                     var vartemp = 1;
                 } else {
                     room_id = Object.keys(snapshot.val())[0];
                     //update last message time
                     roomsRef_u.child(receiver).child(room_id).update({"last": (new Date()).getTime()}); //for user
-                    roomsRef_r.child(profile_user.user_id).child(room_id).update({"last": (new Date()).getTime()}); //for receiver
+                    roomsRef_r.child(profile_user.user_id).child(room_id).update({
+                        "last": (new Date()).getTime(),
+                        "seen": false
+                    }); //for receiver
+                    //update seen for tab button and main controller
+                    //roomsRef_u.update({"all_seen": false});
                 }
                 console.log(room_id);
 
@@ -165,19 +189,67 @@ angular.module('starter.controllers', [])
                         alert("Your message could not be sent." + error);
                     } else {
                         console.log("message sent successfully.");
+
+                        //for noti push
+                        //user.child("users_online").child(receiver).once(function(snap) {
+                        //    var login = snap.val();
+                        //    if (login != null) {
+                        //
+                        //    }
+                        //});
+                        var req = {
+                            method: 'POST',
+                            url: 'https://giv-server.herokuapp.com/push',
+                            data: {
+                                "noti": {
+                                    // "tokens": ["APA91bElXfJLbo8_kJd2YEYVKqK4eIh2AQs8QLT_VnLe_vEXGd20G5a4ufg5NBbjUgTJn2z7h3AHaiXrJaTb81omCF5heM9RSjlVmJ5F-5rMBXT0XGrH8hJWnkbIW1wqi88IUiR6kId-A_XUZ-wBmfs1HNEdMwhQxg"],
+                                    "user_ids": [receiver],
+                                    "notification": {
+                                        "alert": $state.params.chat_mate.full_name + ": " + message_to_send,
+                                        "android": {
+                                            "badge": 1,
+                                            "sound": "chime.aiff",
+                                            "expiry": 1423238641,
+                                            "priority": 10,
+                                            "contentAvailable": true,
+                                            "payload": {
+                                                "key1": "value",
+                                                "key2": "value"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                     }
+
+                    // Make the API call
+                    $http(req).success(function(resp){
+                        // Handle success
+                        console.log("Ionic Push: Push success! " + resp);
+                    }).error(function(error){
+
+                        // Handle error
+                        console.log("Ionic Push: Push error...");
+                    });
+
                 });
 
                 //if room is created first time, monitor room
                 if (vartemp == 1) {
-                    console.log('run');
                     user.child("rooms").child(room_id).on("child_added", function (chat_snapshot) {
+                        //push message to scope
                         chats.push(chat_snapshot.val());
                         $scope.chats = chats;
+                        //change message status to seen
+                        roomsRef_u.child(receiver).child(room_id).update({
+                            seen: "true"
+                        });
+                        //scroll down when new message
                         $timeout(function () {
                             viewScroll.scrollBottom();
                         }, 0);
-                        console.log(chats);
                         $scope.hide();
                     });
                 }
@@ -226,9 +298,9 @@ angular.module('starter.controllers', [])
             });
         });
 
-        //if one user signout remove from the list
+        //remove one from favorite
         $scope.remove = function (removed_id) {
-            user.child("users").child("favorite").update({removed_id: null});
+            user.child("users").child("favorite").child(removed_id).update({});
 
             //remove id from $scope.favs
             $scope.favs = $scope.favs
@@ -260,8 +332,9 @@ angular.module('starter.controllers', [])
         //    end of FavoriteCtrl
     })
 
-    .controller('LoginCtrl', function (store, $scope, $location, auth, $state, $firebase, $cordovaGeolocation) {
+    .controller('LoginCtrl', function (store, $scope, $location, auth, $state, $firebase, $rootScope, $ionicUser, $ionicPush, GPS) {
         // LoginCtrl.js
+
         $scope.login = function () {
             auth.signin({
                 authParams: {
@@ -273,9 +346,52 @@ angular.module('starter.controllers', [])
                 store.set('token', token);
                 store.set('refreshToken', refreshToken);
                 $location.path('/');
+
+                //register ionic service
+                console.log('Ionic User: Identifying with Ionic User service');
+
+                var user_push = $ionicUser.get();
+                if(!user_push.user_id) {
+                    // Set your user_id here, or generate a random one.
+                    user_push.user_id = auth.profile.user_id;
+                }
+
+                // Add some metadata to your user object.
+                angular.extend(user_push, {
+                    "full_name": auth.profile.name
+                });
+
+                console.log(user_push.user_id);
+
+                // Identify your user with the Ionic User Service
+                if (user_push.user_id != null) {
+                    $ionicUser.identify(user_push).then(function () {
+                        $scope.identified = true;
+                        console.log(user_push.user_id);
+                        console.log('Identified user ' + user_push.full_name + '\n ID ' + user_push.user_id);
+
+                        console.log('Ionic Push: Registering user');
+
+                        // Register with the Ionic Push service.  All parameters are optional.
+                        $ionicPush.register({
+                            canShowAlert: true, //Can pushes show an alert on your screen?
+                            canSetBadge: true, //Can pushes update app icon badges?
+                            canPlaySound: true, //Can notifications play a sound?
+                            canRunActionsOnWake: true, //Can run actions outside the app,
+                            onNotification: function(notification) {
+                                alert(notification);
+                                return true;
+                            }
+                        });
+                    });
+                }
+
+                //end of push register
+
                 auth.getToken({
                     api: 'firebase'
                 }).then(function (delegation) {
+                    console.log(delegation);
                     store.set('firebaseToken', delegation.id_token);
                     $state.go('tab.givs');
                     // save data to firebase
@@ -288,9 +404,10 @@ angular.module('starter.controllers', [])
                         else console.log(auth);
                     });
 
+
                     // save info everytime user login
                     var usersRef = user.child("users").child(auth.profile.user_id);
-                    usersRef.set({
+                    usersRef.update({
                         "email": auth.profile.email,
                         "full_name": auth.profile.name,
                         "headline": auth.profile.headline,
@@ -298,29 +415,8 @@ angular.module('starter.controllers', [])
                         "picture": auth.profile.picture
                     });
 
-
-                    var users_online = user.child("users_online").child(auth.profile.user_id);
-                    //get gps position
-                    var gps = {"lat": "", "long": ""};
-                    var posOptions = {timeout: 10000, enableHighAccuracy: false};
-                    $cordovaGeolocation
-                        .getCurrentPosition(posOptions)
-                        .then(function (position) {
-                            gps.lat = position.coords.latitude;
-                            gps.long = position.coords.longitude;
-                            console.log(gps);
-                            users_online.set({
-                                "online": true,
-                                "position": {
-                                    "lat": gps.lat,
-                                    "long": gps.long
-                                }
-                            });
-                            store.set('gps', gps);
-                        }, function (err) {
-                            // error
-                            alert("Can't get gps position " + err);
-                        });
+                    //set gps
+                    GPS.refresh();
 
                 }, function (error) {
                     // Error getting the firebase token
@@ -414,6 +510,12 @@ angular.module('starter.controllers', [])
             $state.go("tab.giv-detail", {givId: givId})
         };
 
+        //sendMessage
+        $scope.openRoom = function (chat_mate) {
+            console.log(roomId);
+            $state.go('tab.message/message-detail', {chat_mate: chat_mate});
+        };
+
         //pull to refresh
         $scope.doRefresh = function () {
             GPS.refresh();
@@ -452,7 +554,7 @@ angular.module('starter.controllers', [])
 
         //send message
         $scope.sendMessage = function (chat_mate) {
-            $state.go('tab.message-detail', {chat_mate: chat_mate});
+            $state.go('tab.message/message-detail', {chat_mate: chat_mate});
         };
 
         //add favorite user
@@ -468,7 +570,7 @@ angular.module('starter.controllers', [])
             });
         };
 
-        //old send message
+        //old send message (deprecated)
         $scope.sendMessageOld = function () {
             var receiver = giv_id;
             var message_to_send = $scope.IM.content;
@@ -592,3 +694,4 @@ angular.module('starter.controllers', [])
         };
         $scope.hide();
     });
+

@@ -16,9 +16,9 @@
 
                 <p>{{value.headline}}</p>
 
-                <p>{{"#"+ value.hashtag.hashtag1 + " #" +value.hashtag.hashtag2 + " #" + value.hashtag.hashtag3}}</p>
+                <p ng-if="value.hashtag.hashtag1">{{"#"+ value.hashtag.hashtag1 + " #" +value.hashtag.hashtag2 + " #" + value.hashtag.hashtag3}}</p>
 
-                <p>Distance: {{value.distance}} Km</p>
+                <p ng-if="value.distance">Distance: {{value.distance}} Km</p>
                 <i class="icon ion-chevron-right icon-accessory"></i>
 
                 <!--<ion-option-button class="button-positive" ng-click="remove(giv_key)">-->

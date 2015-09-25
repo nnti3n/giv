@@ -1,13 +1,15 @@
 <ion-view cache-view="false" view-title="Messages">
+    <mlz-back-button></mlz-back-button>
     <ion-content>
         <ion-list>
-            <ion-item class="item-icon-left item-avatar" ng-repeat="room in rooms | orderBy: 'last':true"
+            <ion-item class="item-icon-right item-avatar" ng-repeat="room in rooms | orderBy: 'last':true"
                       type="item-text-wrap" ng-click="openRoom(room.room_id, room)">
                 <img ng-src="{{room.picture}}"/>
 
                 <h2 style="margin-left:20px">{{room.full_name}}</h2>
 
                 <p style="margin-left:20px">{{room.time}}</p>
+                <i ng-if="room.seen == false || room.seen == null" class="icon ion-email-unread"></i>
                 <ion-option-button class="button-positive" ng-click="GoToLink(room.url)">
                     Profile
                 </ion-option-button>

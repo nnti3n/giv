@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'ngCordova', 'angularMoment','monospaced.elastic'])
+angular.module('starter', ['ionic','ionic.service.core','ngCordova','ionic.service.push',   'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt',  'angularMoment','monospaced.elastic'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
