@@ -570,60 +570,6 @@ angular.module('starter.controllers', [])
             });
         };
 
-        //old send message (deprecated)
-        $scope.sendMessageOld = function () {
-            var receiver = giv_id;
-            var message_to_send = $scope.IM.content;
-            $scope.IM.content = '';
-
-            // set database url for sender and receiver
-            var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
-            var roomsRef_r = user.child("users").child(receiver).child("rooms");
-            // watch if chat room is created or not
-            roomsRef_u.child(receiver).once("value", function (snapshot) {
-                if (snapshot.val() == null) {
-
-                    // if room is not created, generate room id for the chat room with time user_id->chatter->room_id and save room_id to both user's rooms
-                    var room_id = roomsRef_u.child(receiver).push({"last": (new Date()).getTime()}).key();
-                    roomsRef_r.child(profile_user.user_id).child(room_id).set({"last": (new Date()).getTime()});
-
-                    //then push message to chat room (and create room)
-                    user.child("rooms").child(room_id).push({
-                        "time": (new Date()).getTime(),
-                        "from": profile_user.user_id,
-                        "to": receiver,
-                        "content": message_to_send
-                    }, function (error) {
-                        if (error) {
-                            alert("Your message could not be sent." + error);
-                        } else {
-                            alert("message sent successfully.");
-                        }
-                    })
-                } else {
-                    var chat_key = Object.keys(snapshot.val());
-
-                    //update last message time for message tab time order
-                    roomsRef_u.child(receiver).child(chat_key[0]).update({"last": (new Date()).getTime()});
-                    roomsRef_r.child(profile_user.user_id).child(chat_key[0]).update({"last": (new Date()).getTime()});
-
-                    // if room is created, add chat to the chatroom
-                    user.child("rooms").child(chat_key[0]).push({
-                        "time": (new Date()).getTime(),
-                        "from": profile_user.user_id,
-                        "to": receiver,
-                        "content": message_to_send
-                    }, function (error) {
-                        if (error) {
-                            alert("Your message could not be sent." + error);
-                        } else {
-                            alert("message sent successfully.");
-                        }
-                    })
-                }
-            });
-        };
-
         $scope.GoToLink = function (url) {
             window.open(url, '_system', 'location=yes');
             $scope.hide();
