@@ -1,25 +1,42 @@
-<!--<ion-view view-title="GIV">
-    <!--<ion-content class="padding login-background">-->
-        <!--&lt;!&ndash;<div class="list">&ndash;&gt;-->
-            <!--&lt;!&ndash;<div class="logoText">&ndash;&gt;-->
-                <!--&lt;!&ndash;GIV&ndash;&gt;-->
-            <!--&lt;!&ndash;</div>&ndash;&gt;-->
-        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-        <!-- -->
-        <!--<div class="list" style="text-align:center">-->
-            <!--&lt;!&ndash;<button ng-click="modal.show()" class="button button-small button-outline icon-left ion-person-add button-positive">&ndash;&gt;-->
-                <!--&lt;!&ndash;Create New Account&ndash;&gt;-->
-            <!--&lt;!&ndash;</button>&ndash;&gt;-->
-        <!--</div>-->
-    <!--</ion-content>-->
-<!--</ion-view>-->
-<div class="login-background">
-    <div class="card login-button" style="padding:0">
+<ion-view hide-nav-bar="true">
+    <ion-content class="padding" scroll="false">
 
-        <button ng-click="login()" type="submit" class="button button-block activated login-button-inside">
-            <img src="../img/linkedin.ico" width="25" height="25" style="transform: translateY(7px) translateX(-5px)">
-            Sign In With Linkedin
-        </button>
+        <div class="login-wrapper" id="lw">
 
-    </div>
-</div>
+            <img class="giv-image" src="../img/giv-icon.png">
+
+            <br>
+
+            <div class="login-button-group">
+                <!-- line break -->
+                    <div class="login-linebreak">
+                <span class="break-or">
+                    or
+                </span>
+                    </div>
+
+                <br>
+
+                <button ng-click="login()" type="submit" class="button button-block button-linkedin">
+                    <img class="icon-linkedin" src="../img/LinkedIn.svg">
+                    Login with Linkedin
+                </button>
+
+            </div>
+
+        </div>
+
+    </ion-content>
+</ion-view>
+
+
+<!--<div class="login-background">-->
+<!--<div class="card login-button" style="padding:0">-->
+
+<!--<button ng-click="login()" type="submit" class="button button-block activated login-button-inside">-->
+<!--<img src="../img/linkedin.ico" width="25" height="25" style="transform: translateY(7px) translateX(-5px)">-->
+<!--Sign In With Linkedin-->
+<!--</button>-->
+
+<!--</div>-->
+<!--</div>-->

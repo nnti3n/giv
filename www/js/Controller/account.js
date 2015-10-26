@@ -1,6 +1,6 @@
 angular.module('starter.controllers')
 
-.controller('AccountCtrl', function ($scope, store, auth, $state, $location, GPS) {
+.controller('AccountCtrl', function ($scope, store, auth, $state, $location, $http, GPS) {
         $scope.show();
         var profile_user = store.get('profile');
         $scope.submit_hash = function () {
@@ -20,9 +20,22 @@ angular.module('starter.controllers')
 
         $scope.auth = auth;
 
-        $scope.settings = {
-            enableFriends: true
+        //load skill
+        var req = {
+            method: 'POST',
+            url: 'https://giv-server.herokuapp.com/getpersonskill',
+            data: {
+                "sID":"linkedin|Tbz90p6Y4u"
+            }
         };
+
+        $http(req).success(function (data) {
+            // Handle success
+          $scope.skills = data;
+        }).error(function (error) {
+            // Handle error
+            console.log("Save error: " + error);
+        });
 
         var usersRef = user.child("users").child(profile_user.user_id).child("hashtag");
         usersRef.on("value", function (snap) {

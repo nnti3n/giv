@@ -148,9 +148,6 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                     }
                 },
                 data: {
-                    // This tells Auth0 that this state requires the user to be logged in.
-                    // If the user isn't logged in and he tries to access this state
-                    // he'll be redirected to the login page
                     requiresLogin: true
                 }
             })
@@ -164,9 +161,6 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                     }
                 },
                 data: {
-                    // This tells Auth0 that this state requires the user to be logged in.
-                    // If the user isn't logged in and he tries to access this state
-                    // he'll be redirected to the login page
                     requiresLogin: true
                 },
                 cache: false
@@ -200,9 +194,6 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                     }
                 },
                 data: {
-                    // This tells Auth0 that this state requires the user to be logged in.
-                    // If the user isn't logged in and he tries to access this state
-                    // he'll be redirected to the login page
                     requiresLogin: true
                 },
                 cache: false
@@ -217,11 +208,22 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                     }
                 },
                 data: {
-                    // This tells Auth0 that this state requires the user to be logged in.
-                    // If the user isn't logged in and he tries to access this state
-                    // he'll be redirected to the login page
                     requiresLogin: true
                 }
+            })
+
+            .state('tab.search', {
+                url: '/search',
+                views: {
+                    'tab-search': {
+                        templateUrl: 'templates/tab-search.html',
+                        controller: 'SearchCtrl'
+                    }
+                },
+                data: {
+                    requiresLogin: true
+                },
+                cache: false
             });
 
 

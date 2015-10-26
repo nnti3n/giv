@@ -29,19 +29,77 @@ angular.module('starter.services', [])
         }
     })
 
-    .factory('SkillSet', function() {
-        var skills = [{1: "entrepreneur"}, {2: "software engineer"}, {3:"UI/UX Designer"}, {5:"Business Analyst"}, {6: "entrepreneur"}, {7: "software engineer"}, {8:"UI/UX Designer"}, {9:"Business Analyst"}, {10: "entrepreneur"}, {11: "software engineer"}, {12:"UI/UX Designer"}, {13:"Business Analyst"}, {14: "entrepreneur"},{15: "software engineer"}, {16:"UI/UX Designer"}, {17:"Business Analyst"}, {18: "entrepreneur"}, {19: "software engineer"}, {20:"UI/UX Designer"}, {21:"Business Analyst"}, {22: "entrepreneur"}, {23: "software engineer"}, {24:"UI/UX Designer"}, {25:"Business Analyst"}, {26: "entrepreneur"}, {27: "software engineer"},{ 28:"UI/UX Designer"}, {29:"Business Analyst"}, {30: "entrepreneur"}, {31: "software engineer"}, {32:"UI/UX Designer"}, {33:"Business Analyst"}];
+    .factory('SkillSet', function (store, $http, $timeout) {
+        //var skills = [{"skill": "entrepreneur", "id": 1}, {
+        //    "skill": "software engineer",
+        //    "id": 3
+        //}, {"skill": "UI/UX Designer", "id": 4}, {"skill": "Business Analyst", "id": 5}, {
+        //    "skill": "entrepreneur",
+        //    "id": 6
+        //}, {"skill": "software engineer", "id": 7}, {"skill": "UI/UX Designer", "id": 8}, {
+        //    "skill": "Business Analyst",
+        //    "id": 9
+        //}, {"skill": "entrepreneur", "id": 10}, {"id": 11, "skill": "software engineer"}, {
+        //    "id": 12,
+        //    "skill": "UI/UX Designer"
+        //}, {"id": 13, "skill": "Business Analyst"}, {"id": 14, "skill": "entrepreneur"}, {
+        //    "id": 15,
+        //    "skill": "software engineer"
+        //}, {"id": 16, "skill": "UI/UX Designer"}, {"skill": "Business Analyst", "id": 17}, {
+        //    "skill": "entrepreneur",
+        //    "id": 19
+        //}, {"skill": "Javascript", "id": 54}, {"skill": "Data Scientist", "id": 58}, {
+        //    "skill": "Entreprenuer",
+        //    "id": 60
+        //}, {"skill": "Growth Hacker", "id": 61}, {"skill": "UI/UX Designer", "id": 66}, {
+        //    "skill": "Startup",
+        //    "id": 67
+        //}, {"skill": "Big Data", "id": 68}];
 
+        var user_skill = [];
 
-       return {
-           all: function () {
-               return skills;
-           },
-           more: function() {
-               skills.splice(0,10);
-           },
-           remove: function(object) {
-               skills.splice(skills.indexOf(object), 1);
-           }
-       }
+        function isInArray(value, array) {
+            return array.indexOf(value) > -1;
+        }
+
+        var skills = [];
+
+        return {
+            select: function (object) {
+                if (isInArray(object.id, user_skill)) {
+                    user_skill.splice(user_skill.indexOf(object.id), 1);
+                }
+                else {
+                    user_skill.push(object.id);
+                }
+                console.log(user_skill);
+            },
+            more: function () {
+                skills.splice(0, 10);
+            },
+            save: function () {
+
+                var profile_user = store.get('profile');
+
+                var req_save = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/createrela',
+                    data: {
+                        "sID": profile_user.user_id,
+                        "label": "SKILL",
+                        "skills": user_skill
+                    }
+                };
+
+                $http(req_save).success(function (resp) {
+                    // Handle success
+                    console.log("Save relation successful! " + resp);
+                }).error(function (error) {
+
+                    // Handle error
+                    console.log("Save error: " + error);
+                });
+            }
+
+        }
     });

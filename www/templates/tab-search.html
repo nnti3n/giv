@@ -9,8 +9,8 @@
                 <div class="item item-divider">
                     Skills
                 </div>
-                <div class="item item-text-wrap" style="min-height:390px;">
-                   <a class="skill" ng-repeat="(key, value) in skills | filter:search.searchText | limitTo: 15" ng-click="remove(value)">{{value}}</a>
+                <div class="item item-text-wrap" style="min-height:300px;">
+                   <a class="skill" ng-repeat="item in skills | filter:search.searchText | limitTo: 15" ng-click="select(item)" ng-class="{skillselected: item.selected == true}">{{item.skill}}</a>
 
                 </div>
                 <div class="item item-divider">
@@ -20,6 +20,10 @@
 
             <button class="button button-positive" ng-click="more()" style="width:95%;margin-left:2%">
                 More
+            </button>
+
+            <button class="button button-positive" ng-click="save()" style="width:95%;margin: 2% 0 0 2%;">
+                Save
             </button>
 
         </ion-list>

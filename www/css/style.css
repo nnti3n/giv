@@ -231,8 +231,13 @@ a.autolinker {
     padding: 0 5px 0 5px;
     line-height: 2.2;
     border-radius: 10px;
+    font-size: 14px;
     display: inline-block;
 }
+
+    .skillselected {
+        background-color: #4cf51f;
+    }
 
 .login-wrapper {
     padding: 0 10% 10% 10%;
@@ -271,3 +276,17 @@ a.autolinker {
     top: 25%;
     margin: auto;
 }
+
+.login-linebreak {
+    height: 1px;
+    background-color: black;
+    text-align: center;
+}
+
+    .or-break {
+        background-color: white;
+        position: relative;
+        top: -0.8em;
+        padding: 0 5px;
+        font-size:14px;
+    }
