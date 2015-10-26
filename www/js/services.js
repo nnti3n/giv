@@ -1,71 +1,12 @@
 angular.module('starter.services', [])
 
-    .factory('Givs', function (store) {
-        //calculate distance by km
-        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            var R = 6371; // Radius of the earth in km
-            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-            var dLon = deg2rad(lon2 - lon1);
-            var a =
-                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2)
-                ;
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            var d = R * c; // Distance in km
-            return Math.round(d * 100) / 100;
-        }
-
-        function deg2rad(deg) {
-            return deg * (Math.PI / 180);
-        }
-
-        //var chats = [];
-        //user.child("users_online").on("child_added", function (snapshot) {
-        //    //console.log("a");
-        //    var gps2 = snapshot.val().position;
-        //    var gps = store.get('gps');
-        //    user.child("users").child(snapshot.key()).once("value", function (snap) {
-        //        //push user online information to array
-        //        if (snapshot.key() != store.get('profile').user_id) {
-        //            chats.push(snap.val());
-        //            chats[chats.length - 1].distance = getDistanceFromLatLonInKm(gps.lat, gps.long, gps2.lat, gps2.long);
-        //        }
-        //        console.log(chats);
-        //    });
-        //});
-
-        return {
-            //distance: function () {
-            //    return chats;
-            //},
-            remove: function (giv) {
-                givs.splice(givs.indexOf(giv), 1);
-            },
-            get: function (givId) {
-                //for (var i = 0; i < chats.length; i++) {
-                //  if (chats[i].email === parseInt(chatId)) {
-                //    return chats[i];
-                //  }
-                //}
-                for (var child in givs) {
-                    if (child === givId) {
-                        console.log(givs[child]);
-                        return givs[child];
-                    }
-                }
-                return null;
-            }
-        };
-    })
-
     .factory('GPS', function (auth, store, $cordovaGeolocation) {
         return {
             refresh: function () {
                 var users_online = user.child("users_online").child(auth.profile.user_id);
                 //get gps position
                 var gps = {"lat": "", "long": ""};
-                var posOptions = {timeout: 10000, enableHighAccuracy: false};
+                var posOptions = {timeout: 15000, enableHighAccuracy: true};
                 $cordovaGeolocation
                     .getCurrentPosition(posOptions)
                     .then(function (position) {
@@ -86,4 +27,21 @@ angular.module('starter.services', [])
                     });
             }
         }
+    })
+
+    .factory('SkillSet', function() {
+        var skills = [{1: "entrepreneur"}, {2: "software engineer"}, {3:"UI/UX Designer"}, {5:"Business Analyst"}, {6: "entrepreneur"}, {7: "software engineer"}, {8:"UI/UX Designer"}, {9:"Business Analyst"}, {10: "entrepreneur"}, {11: "software engineer"}, {12:"UI/UX Designer"}, {13:"Business Analyst"}, {14: "entrepreneur"},{15: "software engineer"}, {16:"UI/UX Designer"}, {17:"Business Analyst"}, {18: "entrepreneur"}, {19: "software engineer"}, {20:"UI/UX Designer"}, {21:"Business Analyst"}, {22: "entrepreneur"}, {23: "software engineer"}, {24:"UI/UX Designer"}, {25:"Business Analyst"}, {26: "entrepreneur"}, {27: "software engineer"},{ 28:"UI/UX Designer"}, {29:"Business Analyst"}, {30: "entrepreneur"}, {31: "software engineer"}, {32:"UI/UX Designer"}, {33:"Business Analyst"}];
+
+
+       return {
+           all: function () {
+               return skills;
+           },
+           more: function() {
+               skills.splice(0,10);
+           },
+           remove: function(object) {
+               skills.splice(skills.indexOf(object), 1);
+           }
+       }
     });

@@ -1,4 +1,10 @@
 /* Empty. Add your own CSS if you like */
+
+@font-face {
+    font-family: "Gotham Book";
+    src: url(../font/GothamBook.woff);
+}
+
 body {
     cursor: url('http://ionicframework.com/img/finger.png'), auto;
 }
@@ -216,4 +222,52 @@ a.autolinker {
     color: black !important;
     margin:0;
     border-radius: 25px;
+}
+
+.skill {
+    background-color: #387ef5;
+    color: white;
+    margin: 5px 5px 5px 10px;
+    padding: 0 5px 0 5px;
+    line-height: 2.2;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.login-wrapper {
+    padding: 0 10% 10% 10%;
+    height: 100%;
+    position: relative;
+}
+
+.login-button-group {
+    position: absolute;
+    bottom: 6%;
+    width: 80%;
+}
+
+.button-linkedin {
+    background-color: #187C88;
+    color:white;
+    font-family: "Gotham Book";
+    font-size: 14px;
+    height: 50px;
+}
+
+.button-linkedin:hover {
+    color: whitesmoke;
+}
+
+.icon-linkedin {
+    position: absolute;
+    left: 5%;
+    top: 18%;
+}
+
+.giv-image {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 25%;
+    margin: auto;
 }

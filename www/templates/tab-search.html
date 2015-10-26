@@ -1,0 +1,27 @@
+<ion-view view-title="Search" cache-view="false">
+    <ion-content>
+        <ion-list>
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="search.searchText">
+            </label>
+            <div class="card">
+                <div class="item item-divider">
+                    Skills
+                </div>
+                <div class="item item-text-wrap" style="min-height:390px;">
+                   <a class="skill" ng-repeat="(key, value) in skills | filter:search.searchText | limitTo: 15" ng-click="remove(value)">{{value}}</a>
+
+                </div>
+                <div class="item item-divider">
+                    I'm a Footer in a Card!
+                </div>
+            </div>
+
+            <button class="button button-positive" ng-click="more()" style="width:95%;margin-left:2%">
+                More
+            </button>
+
+        </ion-list>
+    </ion-content>
+</ion-view>

@@ -1,13 +1,8 @@
-// Ionic Starter App
+angular.module('starter.controllers', []);
 
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.services' is found in services.js
-// 'starter.controllers' is found in controllers.js
-var GIVapp = angular.module('starter', ['ionic','ionic.service.core','ngCordova','ionic.service.push',   'firebase', 'starter.controllers', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt',  'angularMoment','monospaced.elastic'])
+angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 'ionic.service.push', 'ngCordova', 'firebase', 'starter.services', 'auth0', 'angular-storage', 'angular-jwt', 'angularMoment', 'monospaced.elastic'])
 
-    .run(function ($ionicPlatform) {
+    .run(function ($ionicPlatform, GPS, auth) {
         $ionicPlatform.ready(function () {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
             // for form inputs)
@@ -27,19 +22,33 @@ var GIVapp = angular.module('starter', ['ionic','ionic.service.core','ngCordova'
                 cordova.addStickyDocumentEventHandler('handleopenurl');
             }
 
-            function handleOpenURL (url) {
-                cordova.fireDocumentEvent('handleopenurl', { url: url });
+            function handleOpenURL(url) {
+                cordova.fireDocumentEvent('handleopenurl', {url: url});
+            }
+
+            document.addEventListener("resume", onResume, false);
+
+            document.addEventListener("pause", onPause, false);
+
+            function onPause() {
+                var users_online = user.child("users_online").child(auth.profile.user_id);
+                users_online.set(null);
+            }
+
+            function onResume() {
+                // Handle the resume event
+                GPS.refresh();
             }
 
             //check internet connection
-            if(window.Connection) {
-                if(navigator.connection.type == Connection.NONE) {
+            if (window.Connection) {
+                if (navigator.connection.type == Connection.NONE) {
                     $ionicPopup.confirm({
                         title: 'No Internet Connection',
                         content: 'Sorry, no Internet connectivity detected. Please reconnect and try again.'
                     })
-                        .then(function(result) {
-                            if(!result) {
+                        .then(function (result) {
+                            if (!result) {
                                 ionic.Platform.exitApp();
                             }
                         });
@@ -84,12 +93,13 @@ var GIVapp = angular.module('starter', ['ionic','ionic.service.core','ngCordova'
         });
     })
 
-    .config(function ($stateProvider, $urlRouterProvider, authProvider) {
+    .
+    config(function ($stateProvider, $urlRouterProvider, authProvider) {
 
         // Ionic uses AngularUI Router which uses the concept of states
         // Learn more here: https://github.com/angular-ui/ui-router
         // Set up the various states which the app can be in.
-        // Each state's controller can be found in controllers.js
+        // Each state's controller can be found in main.js
         $stateProvider
 
             // setup an abstract state for the tabs directive
@@ -127,7 +137,7 @@ var GIVapp = angular.module('starter', ['ionic','ionic.service.core','ngCordova'
             .state('tab.message/message-detail', {
                 url: '/message/detail',
 
-                params : {
+                params: {
                     chat_mate: null,
                     roomId: null
                 },
@@ -226,27 +236,27 @@ var GIVapp = angular.module('starter', ['ionic','ionic.service.core','ngCordova'
     })
 
 
-.config(function (authProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
+    .config(function (authProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
 
-  jwtInterceptorProvider.tokenGetter = function(store, jwtHelper, auth) {
-    var idToken = store.get('token');
-    var refreshToken = store.get('refreshToken');
-    // If no token return null
-    if (!idToken || !refreshToken) {
-      return null;
-    }
-    // If token is expired, get a new one
-    if (jwtHelper.isTokenExpired(idToken)) {
-      return auth.refreshIdToken(refreshToken).then(function(idToken) {
-        store.set('token', idToken);
-        return idToken;
-      });
-    } else {
-      return idToken;
-    }
-  };
-    $httpProvider.interceptors.push('jwtInterceptor');
-});
+        jwtInterceptorProvider.tokenGetter = function (store, jwtHelper, auth) {
+            var idToken = store.get('token');
+            var refreshToken = store.get('refreshToken');
+            // If no token return null
+            if (!idToken || !refreshToken) {
+                return null;
+            }
+            // If token is expired, get a new one
+            if (jwtHelper.isTokenExpired(idToken)) {
+                return auth.refreshIdToken(refreshToken).then(function (idToken) {
+                    store.set('token', idToken);
+                    return idToken;
+                });
+            } else {
+                return idToken;
+            }
+        };
+        $httpProvider.interceptors.push('jwtInterceptor');
+    });
 
 //global variable for firebase
 var user = new Firebase("https://giv.firebaseio.com/userdata");
