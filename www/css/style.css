@@ -207,6 +207,11 @@ a.autolinker {
     position: relative;
 }
 
+.login-background-misc {
+    background: url(../img/Login_BG@2x.png);
+    background-size: cover;
+}
+
 .login-button {
     position: absolute;
     bottom: 12%;
@@ -245,6 +250,8 @@ a.autolinker {
     position: relative;
 }
 
+
+
 .login-button-group {
     position: absolute;
     bottom: 6%;
@@ -252,17 +259,21 @@ a.autolinker {
 }
 
 .button-linkedin {
-    background-color: #187C88;
+    background-color: #0A93C9;
     color:white;
     font-family: "Gotham Book";
-    /*font-size: 14px;*/
-    height: 50px;
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
 }
 
 .button-facebook {
     background-color: #0DB14B;
     color:white;
     font-family: "Gotham Book";
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
 }
 
 .button-linkedin:hover, .button-facebook:hover {
@@ -279,8 +290,9 @@ a.autolinker {
     position: absolute;
     left: 0;
     right: 0;
-    top: 25%;
+    top: 30%;
     margin: auto;
+    width: 22%;
 }
 
 .login-linebreak {
