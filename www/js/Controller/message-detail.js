@@ -1,6 +1,6 @@
 angular.module('starter.controllers')
 
-    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http) {
+    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http, auth) {
         //$scope.show();
 
         $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
@@ -134,6 +134,7 @@ angular.module('starter.controllers')
                         user.child("users").child(receiver).update({"all_seen": false});
                         // Make the API call
                         user.child("online_users").child(receiver).once("value", function (snapshot) {
+                            console.log(snapshot);
                             if (snapshot == null) {
                                 //create string to push
                                 var req = {
@@ -142,9 +143,9 @@ angular.module('starter.controllers')
                                     data: {
                                         "noti": {
                                             // "tokens": ["APA91bElXfJLbo8_kJd2YEYVKqK4eIh2AQs8QLT_VnLe_vEXGd20G5a4ufg5NBbjUgTJn2z7h3AHaiXrJaTb81omCF5heM9RSjlVmJ5F-5rMBXT0XGrH8hJWnkbIW1wqi88IUiR6kId-A_XUZ-wBmfs1HNEdMwhQxg"],
-                                            "user_ids": [profile_user.user_id],
+                                            "user_ids": [receiver],
                                             "notification": {
-                                                "alert": $state.params.chat_mate.full_name + ": " + message_to_send,
+                                                "alert": auth.profile.name + ": " + message_to_send,
                                                 "android": {
                                                     "badge": 1,
                                                     "sound": "chime.aiff",

@@ -203,7 +203,7 @@ a.autolinker {
 }
 
 .login-background {
-    background-image: url(../img/background.jpg);
+    background-image: url(../templates/img/background.jpg);
     position: relative;
 }
 
@@ -231,8 +231,13 @@ a.autolinker {
     padding: 0 5px 0 5px;
     line-height: 2.2;
     border-radius: 10px;
+    font-size: 14px;
     display: inline-block;
 }
+
+    .skillselected {
+        background-color: #4cf51f;
+    }
 
 .login-wrapper {
     padding: 0 10% 10% 10%;

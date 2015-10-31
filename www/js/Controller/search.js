@@ -1,14 +1,21 @@
 angular.module('starter.controllers')
 
     .controller('SearchCtrl', function ($scope, SkillSet, $http) {
+        $scope.show();
+
         //$scope.skills = SkillSet.all();
 
-        $http.get('https://giv-server.herokuapp.com/getallskill').
-            success(function (data) {
-                // this callback will be called asynchronously
-                // when the response is available
-                $scope.skills = data;
-            });
+        //$http.get('https://giv-server.herokuapp.com/getallskill').
+        //    success(function (data) {
+        //        // this callback will be called asynchronously
+        //        // when the response is available
+        //        $scope.skills = data;
+        //    });
+
+        SkillSet.all().success(function (response) {
+            $scope.skills = response;
+            $scope.hide();
+        });
 
         $scope.more = function () {
             SkillSet.more();

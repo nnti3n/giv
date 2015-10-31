@@ -32,7 +32,7 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
 
             function onPause() {
                 var users_online = user.child("users_online").child(auth.profile.user_id);
-                users_online.set(null);
+                users_online.set({});
             }
 
             function onResume() {
@@ -49,6 +49,8 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                     })
                         .then(function (result) {
                             if (!result) {
+                                var users_online = user.child("users_online").child(auth.profile.user_id);
+                                users_online.set({});
                                 ionic.Platform.exitApp();
                             }
                         });

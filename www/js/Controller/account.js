@@ -1,6 +1,6 @@
 angular.module('starter.controllers')
 
-.controller('AccountCtrl', function ($scope, store, auth, $state, $location, $http, GPS) {
+    .controller('AccountCtrl', function ($scope, store, auth, $state, $location, SkillSet, GPS) {
         $scope.show();
         var profile_user = store.get('profile');
         $scope.submit_hash = function () {
@@ -21,21 +21,29 @@ angular.module('starter.controllers')
         $scope.auth = auth;
 
         //load skill
-        var req = {
-            method: 'POST',
-            url: 'https://giv-server.herokuapp.com/getpersonskill',
-            data: {
-                "sID":"linkedin|Tbz90p6Y4u"
+        SkillSet.personal_skill().success(function (response) {
+            $scope.personal_skills = response;
+            $scope.hide();
+        });
+
+        //select skills to remove
+        $scope.select = function (object) {
+            //push skill id to array
+            SkillSet.select(object);
+
+            if ($scope.personal_skills[$scope.personal_skills.indexOf(object)].selected) {
+                $scope.personal_skills[$scope.personal_skills.indexOf(object)].selected = false;
+            }
+            else {
+                $scope.personal_skills[$scope.personal_skills.indexOf(object)].selected = true;
             }
         };
 
-        $http(req).success(function (data) {
-            // Handle success
-          $scope.skills = data;
-        }).error(function (error) {
-            // Handle error
-            console.log("Save error: " + error);
-        });
+        //remove skills
+        $scope.remove = function () {
+            SkillSet.remove();
+            $state.transitionTo($state.current, $state.$current.params, {reload: true, inherit: true, notify: true});
+        };
 
         var usersRef = user.child("users").child(profile_user.user_id).child("hashtag");
         usersRef.on("value", function (snap) {
@@ -62,7 +70,7 @@ angular.module('starter.controllers')
         // Logout
         $scope.logout = function () {
             //delete on online users list
-            var user_online = user.child("users_online").child(auth.profile.user_id);
+            var user_online = user.child("users_online").child(profile_user.user_id);
             user_online.set({});
 
             auth.signout();
@@ -72,5 +80,4 @@ angular.module('starter.controllers')
             store.remove('firebaseToken');
             $state.go('login');
         };
-        $scope.hide();
     });

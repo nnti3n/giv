@@ -10,6 +10,7 @@
                     Skills
                 </div>
                 <div class="item item-text-wrap" style="min-height:300px;">
+                    <!-- change background color if selected-->
                    <a class="skill" ng-repeat="item in skills | filter:search.searchText | limitTo: 15" ng-click="select(item)" ng-class="{skillselected: item.selected == true}">{{item.skill}}</a>
 
                 </div>

@@ -255,11 +255,17 @@ a.autolinker {
     background-color: #187C88;
     color:white;
     font-family: "Gotham Book";
-    font-size: 14px;
+    /*font-size: 14px;*/
     height: 50px;
 }
 
-.button-linkedin:hover {
+.button-facebook {
+    background-color: #0DB14B;
+    color:white;
+    font-family: "Gotham Book";
+}
+
+.button-linkedin:hover, .button-facebook:hover {
     color: whitesmoke;
 }
 

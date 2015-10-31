@@ -23,6 +23,7 @@ angular.module('starter.services', [])
                         store.set('gps', gps);
                     }, function (err) {
                         // error
+                        users_online.set({"online": true});
                         alert("Can't get gps position " + err);
                     });
             }
@@ -30,42 +31,43 @@ angular.module('starter.services', [])
     })
 
     .factory('SkillSet', function (store, $http, $timeout) {
-        //var skills = [{"skill": "entrepreneur", "id": 1}, {
-        //    "skill": "software engineer",
-        //    "id": 3
-        //}, {"skill": "UI/UX Designer", "id": 4}, {"skill": "Business Analyst", "id": 5}, {
-        //    "skill": "entrepreneur",
-        //    "id": 6
-        //}, {"skill": "software engineer", "id": 7}, {"skill": "UI/UX Designer", "id": 8}, {
-        //    "skill": "Business Analyst",
-        //    "id": 9
-        //}, {"skill": "entrepreneur", "id": 10}, {"id": 11, "skill": "software engineer"}, {
-        //    "id": 12,
-        //    "skill": "UI/UX Designer"
-        //}, {"id": 13, "skill": "Business Analyst"}, {"id": 14, "skill": "entrepreneur"}, {
-        //    "id": 15,
-        //    "skill": "software engineer"
-        //}, {"id": 16, "skill": "UI/UX Designer"}, {"skill": "Business Analyst", "id": 17}, {
-        //    "skill": "entrepreneur",
-        //    "id": 19
-        //}, {"skill": "Javascript", "id": 54}, {"skill": "Data Scientist", "id": 58}, {
-        //    "skill": "Entreprenuer",
-        //    "id": 60
-        //}, {"skill": "Growth Hacker", "id": 61}, {"skill": "UI/UX Designer", "id": 66}, {
-        //    "skill": "Startup",
-        //    "id": 67
-        //}, {"skill": "Big Data", "id": 68}];
 
         var user_skill = [];
+
+        var profile_user = store.get('profile');
 
         function isInArray(value, array) {
             return array.indexOf(value) > -1;
         }
 
-        var skills = [];
+        var skills = $http.get('https://giv-server.herokuapp.com/getallskill').
+            success(function (response) {
+                // this callback will be called asynchronously
+                // when the response is available
+                return response;
+            });
+
+        var spliced = [];
 
         return {
+            all: function () {
+              return skills;
+            },
+            personal_skill: function () {
+                var req = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/getpersonskill',
+                    data: {
+                        "sID":profile_user.user_id
+                    }
+                };
+
+                return $http(req).success(function (response) {
+                    return response;
+                });
+            },
             select: function (object) {
+                //push or splice if select
                 if (isInArray(object.id, user_skill)) {
                     user_skill.splice(user_skill.indexOf(object.id), 1);
                 }
@@ -75,11 +77,12 @@ angular.module('starter.services', [])
                 console.log(user_skill);
             },
             more: function () {
-                skills.splice(0, 10);
+                spliced.concat(skills.splice(0, 10));
+                if (skills.length < 1 ) {
+                    skills.concat(spliced.splice(0,spliced.length-1));
+                }
             },
             save: function () {
-
-                var profile_user = store.get('profile');
 
                 var req_save = {
                     method: 'POST',
@@ -98,6 +101,26 @@ angular.module('starter.services', [])
 
                     // Handle error
                     console.log("Save error: " + error);
+                });
+            },
+            remove: function () {
+                var req_remove = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/deleterela',
+                    data: {
+                        "sID": profile_user.user_id,
+                        "label": "SKILL",
+                        "skills": user_skill
+                    }
+                };
+
+                $http(req_remove).success(function (resp) {
+                    // Handle success
+                    console.log("Remove relation successful! " + resp);
+                }).error(function (error) {
+
+                    // Handle error
+                    console.log("Remove error: " + error);
                 });
             }
 

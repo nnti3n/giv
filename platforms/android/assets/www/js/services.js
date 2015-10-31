@@ -23,25 +23,106 @@ angular.module('starter.services', [])
                         store.set('gps', gps);
                     }, function (err) {
                         // error
+                        users_online.set({"online": true});
                         alert("Can't get gps position " + err);
                     });
             }
         }
     })
 
-    .factory('SkillSet', function() {
-        var skills = [{1: "entrepreneur"}, {2: "software engineer"}, {3:"UI/UX Designer"}, {5:"Business Analyst"}, {6: "entrepreneur"}, {7: "software engineer"}, {8:"UI/UX Designer"}, {9:"Business Analyst"}, {10: "entrepreneur"}, {11: "software engineer"}, {12:"UI/UX Designer"}, {13:"Business Analyst"}, {14: "entrepreneur"},{15: "software engineer"}, {16:"UI/UX Designer"}, {17:"Business Analyst"}, {18: "entrepreneur"}, {19: "software engineer"}, {20:"UI/UX Designer"}, {21:"Business Analyst"}, {22: "entrepreneur"}, {23: "software engineer"}, {24:"UI/UX Designer"}, {25:"Business Analyst"}, {26: "entrepreneur"}, {27: "software engineer"},{ 28:"UI/UX Designer"}, {29:"Business Analyst"}, {30: "entrepreneur"}, {31: "software engineer"}, {32:"UI/UX Designer"}, {33:"Business Analyst"}];
+    .factory('SkillSet', function (store, $http, $timeout) {
 
+        var user_skill = [];
 
-       return {
-           all: function () {
-               return skills;
-           },
-           more: function() {
-               skills.splice(0,10);
-           },
-           remove: function(object) {
-               skills.splice(skills.indexOf(object), 1);
-           }
-       }
+        var profile_user = store.get('profile');
+
+        function isInArray(value, array) {
+            return array.indexOf(value) > -1;
+        }
+
+        var skills = $http.get('https://giv-server.herokuapp.com/getallskill').
+            success(function (response) {
+                // this callback will be called asynchronously
+                // when the response is available
+                return response;
+            });
+
+        var spliced = [];
+
+        return {
+            all: function () {
+              return skills;
+            },
+            personal_skill: function () {
+                var req = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/getpersonskill',
+                    data: {
+                        "sID":profile_user.user_id
+                    }
+                };
+
+                return $http(req).success(function (response) {
+                    return response;
+                });
+            },
+            select: function (object) {
+                //push or splice if select
+                if (isInArray(object.id, user_skill)) {
+                    user_skill.splice(user_skill.indexOf(object.id), 1);
+                }
+                else {
+                    user_skill.push(object.id);
+                }
+                console.log(user_skill);
+            },
+            more: function () {
+                spliced.concat(skills.splice(0, 10));
+                if (skills.length < 1 ) {
+                    skills.concat(spliced.splice(0,spliced.length-1));
+                }
+            },
+            save: function () {
+
+                var req_save = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/createrela',
+                    data: {
+                        "sID": profile_user.user_id,
+                        "label": "SKILL",
+                        "skills": user_skill
+                    }
+                };
+
+                $http(req_save).success(function (resp) {
+                    // Handle success
+                    console.log("Save relation successful! " + resp);
+                }).error(function (error) {
+
+                    // Handle error
+                    console.log("Save error: " + error);
+                });
+            },
+            remove: function () {
+                var req_remove = {
+                    method: 'POST',
+                    url: 'https://giv-server.herokuapp.com/deleterela',
+                    data: {
+                        "sID": profile_user.user_id,
+                        "label": "SKILL",
+                        "skills": user_skill
+                    }
+                };
+
+                $http(req_remove).success(function (resp) {
+                    // Handle success
+                    console.log("Remove relation successful! " + resp);
+                }).error(function (error) {
+
+                    // Handle error
+                    console.log("Remove error: " + error);
+                });
+            }
+
+        }
     });
