@@ -287,6 +287,17 @@ a.autolinker {
         box-shadow: none;
     }
 
+    .button.button-linkedin.activated {
+        box-shadow: none !important;
+        background-color: #067ab8;
+    }
+
+    .button.button-facebook.activated {
+        box-shadow: none !important;
+        background-color: #089b36;
+    }
+
+
 .button-facebook {
     background-color: #0DB14B;
     color:white;
