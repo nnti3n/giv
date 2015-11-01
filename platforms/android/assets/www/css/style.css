@@ -5,6 +5,12 @@
     src: url(../font/GothamBook.woff);
 }
 
+@font-face {
+    font-family: "Proxima Nova R";
+    font-weight: bold;
+    src: url(../font/ProximaNovaRegular.otf) format("opentype");
+}
+
 body {
     cursor: url('http://ionicframework.com/img/finger.png'), auto;
 }
@@ -203,8 +209,13 @@ a.autolinker {
 }
 
 .login-background {
-    background-image: url(../templates/img/background.jpg);
+    background-image: url(../img/background.jpg);
     position: relative;
+}
+
+.login-background-misc {
+    background: url(../img/Login_BG@2x.png);
+    background-size: cover;
 }
 
 .login-button {
@@ -245,6 +256,8 @@ a.autolinker {
     position: relative;
 }
 
+
+
 .login-button-group {
     position: absolute;
     bottom: 6%;
@@ -252,29 +265,55 @@ a.autolinker {
 }
 
 .button-linkedin {
-    background-color: #187C88;
+    background-color: #0A93C9;
     color:white;
-    font-family: "Gotham Book";
+    font-family: "Proxima Nova R";
     font-size: 14px;
-    height: 50px;
+    border: none;
+    border-radius: 0;
 }
 
-.button-linkedin:hover {
+    .button-linkedin:focus {
+        background-color: #067ab8;
+        box-shadow: none;
+    }
+
+    .button-linkedin:active {
+        box-shadow: none;
+    }
+
+    .button-facebook:focus {
+        background-color: #089b36;
+        box-shadow: none;
+    }
+
+.button-facebook {
+    background-color: #0DB14B;
+    color:white;
+    font-family: "Proxima Nova R";
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 20px !important;
+}
+
+.button-linkedin:hover, .button-facebook:hover {
     color: whitesmoke;
 }
 
 .icon-linkedin {
     position: absolute;
     left: 5%;
-    top: 18%;
+    top: 23%;
 }
 
 .giv-image {
     position: absolute;
     left: 0;
     right: 0;
-    top: 25%;
+    top: 30%;
     margin: auto;
+    width: 22%;
 }
 
 .login-linebreak {

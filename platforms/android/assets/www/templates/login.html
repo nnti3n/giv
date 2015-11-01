@@ -1,25 +1,23 @@
 <ion-view hide-nav-bar="true">
-    <ion-content class="padding" scroll="false">
+    <ion-content class="padding login-background-misc" scroll="false">
 
         <div class="login-wrapper" id="lw">
 
-            <img class="giv-image" src="img/giv-icon.png">
+            <img class="giv-image" ng-src="img/LOGO_loginscreen@2x.png">
 
             <br>
 
             <div class="login-button-group">
                 <!-- line break -->
-                    <div class="login-linebreak">
-                <span class="break-or">
-                    or
-                </span>
-                    </div>
 
-                <br>
+                <button ng-click="login()" type="submit" class="button button-block button-facebook">
+                    <img class="icon-linkedin" ng-src="img/facebook.svg">
+                    Sign in with Facebook
+                </button>
 
                 <button ng-click="login()" type="submit" class="button button-block button-linkedin">
-                    <img class="icon-linkedin" src="img/LinkedIn.svg">
-                    Login with Linkedin
+                    <img class="icon-linkedin" ng-src="img/LinkedIn.svg">
+                    Sign in with Linkedin
                 </button>
 
             </div>

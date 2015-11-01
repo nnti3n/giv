@@ -211,7 +211,8 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
                 },
                 data: {
                     requiresLogin: true
-                }
+                },
+                cache: false
             })
 
             .state('tab.search', {
