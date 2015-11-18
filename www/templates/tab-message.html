@@ -1,7 +1,7 @@
 <ion-view cache-view="false" view-title="Messages">
-    <mlz-back-button></mlz-back-button>
     <ion-content>
-        <ion-list>
+
+        <ion-list class="message-list">
             <ion-item class="item-icon-right item-avatar" ng-repeat="room in rooms | orderBy: 'last':true"
                       type="item-text-wrap" ng-click="openRoom(room.room_id, room)">
                 <img ng-src="{{room.picture}}"/>
@@ -15,10 +15,6 @@
                 </ion-option-button>
             </ion-item>
         </ion-list>
-        <!--<ion-list ng-hide="rooms.length">-->
-        <!--<ion-item class="textCenter">-->
-        <!--<i class="icon ion-loading-c"></i> Loading Rooms-->
-        <!--</ion-item>-->
-        <!--</ion-list>-->
+
     </ion-content>
 </ion-view>

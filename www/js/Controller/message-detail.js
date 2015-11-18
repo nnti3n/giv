@@ -3,33 +3,41 @@ angular.module('starter.controllers')
     .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http, auth) {
         //$scope.show();
 
+        var profile_user = store.get('profile');
+        //scroll to bottom in first-load message
+        var viewScroll = $ionicScrollDelegate.$getByHandle('userMessageScroll');
+        //take chat room id from params or userlist
+        var room_id = null;
+        //information of both user and chat_mate
+        $scope.chat_mate = $state.params.chat_mate;
+        $scope.user = {};
+        $scope.user.id = profile_user.user_id;
+        $scope.user.picture = profile_user.picture;
+
+        //init chat object
+        $scope.IM = {};
+        $scope.IM.message_detail = '';
+
+        //load chat
+        var chats = [];
+        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
+
+        //add favorite user
+        $scope.favoriteAdd = function () {
+            var json_id = {};
+            json_id[profile_user.user_id] = true;
+            user.child("users").child(profile_user.user_id).child("favorite").update(json_id);
+        };
+
+        $scope.GoBack = function () {
+            $state.go("tab.message");
+        };
+
         $scope.$on('$ionicView.beforeEnter', function (event, viewData) {
             console.log($ionicHistory);
             viewData.enableBack = true;
         });
 
-        var profile_user = store.get('profile');
-
-        console.log($state.params.roomId);
-        console.log($state.params.chat_mate);
-
-        //information of both user and chat_mate
-        $scope.chat_mate = $state.params.chat_mate;
-        $scope.user = {};
-        $scope.user.id = profile_user.user_id;
-        $scope.user.name = profile_user.family_name;
-        $scope.user.picture = profile_user.picture;
-
-        //scroll to bottom in first-load message
-        var viewScroll = $ionicScrollDelegate.$getByHandle('userMessageScroll');
-
-        //load chat
-        var chats = [];
-
-        var roomsRef_u = user.child("users").child(profile_user.user_id).child("rooms");
-
-        //take chat room id from params or userlist
-        var room_id = null;
         if ($state.params.roomId) {
             //navigate from tab-message
             room_id = $state.params.roomId;
@@ -76,16 +84,9 @@ angular.module('starter.controllers')
                     });
                 }
             });
-
         }
 
-        console.log(room_id);
-
-        //init chat object
-        $scope.IM = {};
-        $scope.IM.message_detail = '';
-
-        //send message button
+        // send message button function
         $scope.sendMessage = function (receiver) {
             // set database url for sender and receiver
             var roomsRef_r = user.child("users").child(receiver).child("rooms");
@@ -196,18 +197,26 @@ angular.module('starter.controllers')
             });
 
         };
+        //    end of send message button function
 
-        //add favorite user
-        $scope.favoriteAdd = function () {
-            var json_id = {};
-            json_id[profile_user.user_id] = true;
-            user.child("users").child(profile_user.user_id).child("favorite").update(json_id);
-        };
+    })
 
-        $scope.GoBack = function () {
-            $state.go("tab.message");
-        };
+    //enter to send message
+    .directive('enterSubmit', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, elem, attrs) {
 
-        //$scope.hide();
-        //    end of messageDetailCtrl
+                elem.bind('keydown', function (event) {
+                    var code = event.keyCode || event.which;
+
+                    if (code === 13) {
+                        if (!event.shiftKey) {
+                            event.preventDefault();
+                            scope.$apply(attrs.enterSubmit);
+                        }
+                    }
+                });
+            }
+        }
     });

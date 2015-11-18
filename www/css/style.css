@@ -48,11 +48,11 @@ at the bottom as the textarea resizes */
 }
 
 img.profile-pic {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     position: absolute;
-    /*bottom: 10px;*/
+    top: 2px;
 }
 
 img.profile-pic.left {
@@ -70,12 +70,15 @@ img.profile-pic.right {
 }
 
 .message {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .message-detail {
+    color: #717171;
     white-space: nowrap;
-    font-size: 14px;
+    font-size: 12px;
+    position: absolute;
+    top: -20px;
 }
 
 .bar.item-input-inset .item-input-wrapper input {
@@ -84,53 +87,74 @@ img.profile-pic.right {
 
 .message-wrapper {
     position: relative;
+    height: 100%;
+    width: 100%;
 }
 
 .message-wrapper:last-child {
     margin-bottom: 10px;
 }
 
+.repeat-position {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
 .chat-bubble {
-    border-radius: 5px;
     display: inline-block;
     padding: 10px 18px;
     position: relative;
     margin: 10px;
-    max-width: 80%;
+    max-width: 60%;
 }
 
 .chat-bubble:before {
     content: "\00a0";
     display: block;
-    height: 16px;
-    width: 9px;
+    height: 20px;
+    width: 28px;
     position: absolute;
-    bottom: -7.5px;
+    top: -7.5px;
 }
 
 .chat-bubble.left {
+    border-radius: 10px;
     background-color: #e6e5eb;
+    background-size:cover;
+    color: #717171;
     float: left;
-    margin-left: 55px;
+    margin-left: 65px;
 }
 
+    .chat-bubble.left .message-detail {
+        left: 8px;
+    }
+
 .chat-bubble.left:before {
-    background-color: #e6e5eb;
-    left: 10px;
-    -webkit-transform: rotate(70deg) skew(5deg);
+    /*background-color: #e6e5eb;*/
+    background: url(../img/chat/left_quote.svg);
+    left: -14px;
+    /*-webkit-transform: rotate(70deg) skew(5deg);*/
 }
 
 .chat-bubble.right {
-    background-color: #158ffe;
+    border-radius: 15px;
+    background-color: #0bbe5e;
     color: #fff;
     float: right;
-    margin-right: 55px;
+    margin-right: 65px;
 }
 
+    .chat-bubble.right .message-detail {
+        right: 8px;
+    }
+
 .chat-bubble.right:before {
-    background-color: #158ffe;
-    right: 10px;
-    -webkit-transform: rotate(118deg) skew(-5deg);
+    /*background-color: #158ffe;*/
+    background: url(../img/chat/right_quote.svg);
+    right: -14px;
+    /*-webkit-transform: rotate(118deg) skew(-5deg);*/
 }
 
 .chat-bubble.right a.autolinker {
@@ -153,6 +177,57 @@ img.profile-pic.right {
     position: relative;
     top: -3px;
 }
+
+.send-message textarea {
+    font-size: 18px;
+}
+
+.send-message .bar-footer{
+    height: 50px;
+}
+
+.send-message img {
+    height: 100%;
+    margin-right: 20px;
+}
+
+.send-message .item-input-wrapper, .send-message textarea {
+    background: transparent !important;
+}
+
+.message-padding {
+    padding: 20px 0;
+}
+
+/*message list*/
+
+.message-list ion-item {
+    height: 100px;
+}
+
+    .message-list ion-item .item-content{
+        height: 100%;
+        padding-top: 28px;
+        padding-left: 80px;
+    }
+
+    .message-list ion-item img {
+        max-height: 60px !important;
+        max-width: 60px !important;
+        top: 20px !important;
+        left: 20px !important;
+    }
+
+    .message-list ion-item h2 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #4a4a4a
+    }
+
+    .message-list ion-item p {
+        font-size: 16px;
+        color: #4a4a4a
+    }
 
 input, textarea, .item-input, .item-input-wrapper {
     background-color: #f4f4f4 !important;
@@ -340,3 +415,15 @@ a.autolinker {
         padding: 0 5px;
         font-size:14px;
     }
+
+/*navbar*/
+
+.my-nav-bar {
+    height: 50px !important;
+    border-bottom: solid 2px #0bbe5e !important;
+}
+
+.my-nav-bar .title {
+    color: #0bbe5e !important;
+    font-weight: bold;
+}
