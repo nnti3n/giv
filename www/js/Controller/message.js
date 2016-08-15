@@ -1,6 +1,16 @@
 angular.module('starter.controllers')
 
-    .controller('MessageCtrl', function ($scope, store, auth, $state) {
+    .controller('MessageCtrl', function ($scope, store, auth, $state, $ionicLoading) {
+
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+            });
+        };
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+
         $scope.show();
 
         //get user_id for local storage to load all user's chat rooms

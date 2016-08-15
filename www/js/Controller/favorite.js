@@ -1,6 +1,15 @@
 angular.module('starter.controllers')
 
-.controller('FavoriteCtrl', function ($scope, store, $state, GPS) {
+.controller('FavoriteCtrl', function ($scope, store, $state, GPS, $ionicLoading) {
+
+    $scope.show = function () {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+        });
+    };
+    $scope.hide = function () {
+        $ionicLoading.hide();
+    };
 
         $scope.show();
 

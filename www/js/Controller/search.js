@@ -1,6 +1,16 @@
 angular.module('starter.controllers')
 
-    .controller('SearchCtrl', function ($scope, SkillSet, $http) {
+    .controller('SearchCtrl', function ($scope, SkillSet, $http, $ionicLoading) {
+
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+            });
+        };
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+
         $scope.show();
 
         //$scope.skills = SkillSet.all();

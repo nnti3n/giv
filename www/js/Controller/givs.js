@@ -1,16 +1,14 @@
 angular.module('starter.controllers')
 
-.controller('GivsCtrl', function ($scope, $location, store, GPS, $state) {
-        // With the new view caching in Ionic, Controllers are only called
-        // when they are recreated or on app start, instead of every page change.
-        // To listen for when this page is active (for example, to refresh data),
-        // listen for the $ionicView.enter event:
-        //
-        //$scope.$on('$ionicView.enter', function(e) {
-        //});
-        //$location.path('/');
-
-        //For some loading reason, all the code must be on controller, fix later
+.controller('GivsCtrl', function ($scope, $location, store, GPS, $state, $ionicLoading) {
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+            });
+        };
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
         $scope.show();
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371; // Radius of the earth in km

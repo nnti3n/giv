@@ -31,8 +31,8 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
             document.addEventListener("pause", onPause, false);
 
             function onPause() {
-                var users_online = user.child("users_online").child(auth.profile.user_id);
-                users_online.set({});
+                var user_online = user.child("users_online").child(auth.profile.user_id);
+                user_online.set({});
             }
 
             function onResume() {
@@ -239,6 +239,12 @@ angular.module('starter', ['ionic', 'starter.controllers','ionic.service.core', 
         $urlRouterProvider.otherwise('/tab/givs');
 
     })
+
+    .config(['$ionicConfigProvider', function($ionicConfigProvider) {
+
+        $ionicConfigProvider.tabs.position('bottom'); // other values: top
+
+    }])
 
 
     .config(function (authProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {

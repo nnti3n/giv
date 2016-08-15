@@ -1,6 +1,15 @@
 angular.module('starter.controllers')
 
 .controller('GivDetailCtrl', function ($scope, $stateParams, store, $state) {
+    $scope.show = function () {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+        });
+    };
+    $scope.hide = function () {
+        $ionicLoading.hide();
+    };
+
         $scope.show();
 
         var giv = {};

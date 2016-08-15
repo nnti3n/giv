@@ -1,6 +1,16 @@
 angular.module('starter.controllers')
 
-    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http, auth) {
+    .controller('MessageDetailCtrl', function ($scope, store, $state, $ionicScrollDelegate, $timeout, $ionicHistory, $http, auth, $ionicLoading) {
+
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+            });
+        };
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+
         //$scope.show();
 
         var profile_user = store.get('profile');

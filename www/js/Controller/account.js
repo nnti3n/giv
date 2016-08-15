@@ -1,6 +1,16 @@
 angular.module('starter.controllers')
 
-    .controller('AccountCtrl', function ($scope, store, auth, $state, $location, SkillSet, GPS) {
+    .controller('AccountCtrl', function ($scope, store, auth, $state, $location, SkillSet, GPS, $ionicLoading) {
+
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="ripple" class="spinner-positive"></ion-spinner>'
+            });
+        };
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+
         $scope.show();
         var profile_user = store.get('profile');
         $scope.submit_hash = function () {
